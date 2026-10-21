@@ -2,8 +2,7 @@
 
 Progetto di analisi economica descrittiva, con dashboard interattiva.
 
-**Dashboard:** https://landitommaso.github.io/prezzi-redditi-finanza-pubblica/
-
+**Dashboard:** https://landitommaso.github.io/Dashboard-macro/
 ## Domande di ricerca
 
 1. L'aumento dei prezzi del 2026 ha caratteristiche simili a quello del 2022?
