@@ -1,0 +1,793 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Prezzi, redditi e finanza pubblica in Italia</title>
+<meta name="description" content="Analisi descrittiva di prezzi al consumo, energia, settore agricolo, produttività, salari, redditi e finanza pubblica in Italia, con dati Eurostat, Istat e Banca d'Italia.">
+<meta name="author" content="Tommaso Landi">
+<style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: dashboard a colonna unica con nav ancorata; ogni capitolo = domanda guida + grafico + lettura */
+:root{
+  --bg:#f5f6f4; --surface:#ffffff; --ink:#15181c; --ink-2:#4a5158; --ink-3:#7a8188;
+  --rule:#dde1e3; --grid:#eceeef; --accent:#1d4e6e; --muted:#b9c0c6; --hl:#b4562a;
+  --line:#1d4e6e; --up:#d04444; --down:#2a78d6; --neg:#d04444;
+  --c1:#2a78d6; --c2:#eb6834; --c3:#1baf7a; --c4:#eda100;
+  --f-display:"IBM Plex Sans Condensed","Arial Narrow",system-ui,sans-serif;
+  --f-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-data:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#121517; --surface:#1a1e21; --ink:#eef0f1; --ink-2:#b6bcc2; --ink-3:#8a9198;
+  --rule:#2c3237; --grid:#242a2e; --accent:#8cc0e0; --muted:#4a5258; --hl:#e9935f;
+  --line:#8cc0e0; --up:#e66767; --down:#5598e7; --neg:#e66767;
+  --c1:#3987e5; --c2:#d95926; --c3:#199e70; --c4:#c98500; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#121517; --surface:#1a1e21; --ink:#eef0f1; --ink-2:#b6bcc2; --ink-3:#8a9198;
+  --rule:#2c3237; --grid:#242a2e; --accent:#8cc0e0; --muted:#4a5258; --hl:#e9935f;
+  --line:#8cc0e0; --up:#e66767; --down:#5598e7; --neg:#e66767;
+  --c1:#3987e5; --c2:#d95926; --c3:#199e70; --c4:#c98500; color-scheme:dark}
+html{scroll-behavior:smooth;scroll-padding-top:64px}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.55}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+.wrap{max-width:1100px;margin:0 auto;padding-block:28px 48px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:grid;gap:44px}
+header{display:grid;gap:14px}
+.eyebrow{font-family:var(--f-data);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3)}
+h1{font-family:var(--f-display);font-weight:700;font-size:clamp(32px,5.4vw,52px);line-height:1.02;margin:0;text-wrap:balance}
+h2{font-family:var(--f-display);font-weight:600;font-size:clamp(22px,3vw,27px);line-height:1.15;margin:0;text-wrap:balance}
+h3{font:600 15px/1.3 var(--f-body);margin:0}
+.lead{max-width:72ch;color:var(--ink-2);margin:0;font-size:16px}
+.lead b,.prose b{color:var(--ink);font-weight:600}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:4px 0 0;padding:0;list-style:none;counter-reset:st}
+@media (max-width:760px){.steps{grid-template-columns:1fr}}
+.steps li{counter-increment:st;display:grid;grid-template-columns:auto 1fr;gap:4px 10px;font-size:13.5px;color:var(--ink-2)}
+.steps li::before{content:counter(st);grid-row:span 2;font:700 22px/1 var(--f-display);color:var(--accent)}
+.steps b{color:var(--ink);font-weight:600}
+.kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+@media (max-width:900px){.kpis{grid-template-columns:repeat(2,1fr)}}
+.kpi{background:var(--surface);border:1px solid var(--rule);border-radius:10px;padding:12px 14px;display:grid;gap:2px;align-content:start}
+.kpi .n{font-family:var(--f-display);font-weight:700;font-size:30px;line-height:1.05;font-variant-numeric:tabular-nums}
+.kpi .n.hot{color:var(--up)}
+.kpi .l{font-size:12.5px;color:var(--ink-2)}
+nav.toc{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);border-bottom:1px solid var(--rule);margin-inline:calc(-1*max(16px,env(safe-area-inset-left,0px)));padding:8px max(16px,env(safe-area-inset-left,0px));overflow-x:auto;white-space:nowrap}
+nav.toc a{display:inline-block;font:500 13px var(--f-body);color:var(--ink-2);text-decoration:none;padding:6px 10px;border-radius:6px}
+nav.toc a:hover,nav.toc a:focus-visible{background:var(--surface);color:var(--ink);outline:none}
+nav.toc a span{font-family:var(--f-data);font-size:11px;color:var(--ink-3);margin-right:5px}
+.chapter{display:grid;gap:12px;padding-top:4px}
+.chapter-head{display:grid;gap:6px;border-top:2px solid var(--ink);padding-top:12px}
+.num{font-family:var(--f-data);font-size:12px;color:var(--ink-3);letter-spacing:.05em}
+.ask{font-size:14px;color:var(--ink-2);margin:0}
+.ask::before{content:"Domanda: ";color:var(--ink-3);font-family:var(--f-data);font-size:12px}
+.row{display:grid;grid-template-columns:1.5fr 1fr;gap:16px;align-items:start}
+.row>*,.two>*{min-width:0}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}
+@media (max-width:860px){.row,.two{grid-template-columns:1fr}}
+.panel{background:var(--surface);border:1px solid var(--rule);border-radius:10px;padding:16px 16px 10px;display:grid;gap:10px;min-width:0}
+.prose{display:grid;gap:10px;font-size:14.5px;color:var(--ink-2)}
+.prose p{margin:0}
+.callout{border-left:3px solid var(--accent);padding:2px 0 2px 12px}
+.controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
+.seg{display:inline-flex;border:1px solid var(--rule);border-radius:8px;background:var(--bg);padding:3px;gap:3px}
+.seg button{font:500 13px var(--f-body);color:var(--ink-2);background:none;border:0;border-radius:6px;padding:6px 12px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--surface)}
+.seg button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.legend{display:flex;gap:14px;font-size:12.5px;color:var(--ink-2);flex-wrap:wrap}
+.legend span::before{content:"";display:inline-block;width:14px;height:3px;border-radius:2px;margin-right:6px;vertical-align:3px;background:var(--c)}
+.legend span.bar::before{height:10px;width:10px;vertical-align:-1px}
+.legend span.dash::before{background:repeating-linear-gradient(90deg,var(--c) 0 4px,transparent 4px 7px)}
+.readout{font-family:var(--f-data);font-size:12px;color:var(--ink-2);min-height:1.4em;font-variant-numeric:tabular-nums}
+svg.ch,#total,#delta,#defbars{width:100%;height:auto;display:block;touch-action:pan-y}
+svg text{font-family:var(--f-data);font-size:11px;fill:var(--ink-3)}
+#total text,#delta text{font-size:12px}
+svg .lbl{fill:var(--ink-2)} svg .strong{fill:var(--ink);font-weight:500}
+.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.tile{border:1px solid var(--rule);border-radius:8px;padding:10px 12px;display:grid;gap:2px}
+.tile .n{font-family:var(--f-display);font-weight:700;font-size:26px;font-variant-numeric:tabular-nums}
+.tile .l{font-size:12.5px;color:var(--ink-2)}
+.note{font-size:12.5px;color:var(--ink-3);margin:0}
+.stat{display:grid;gap:2px}
+.stat .big{font-family:var(--f-display);font-weight:700;font-size:38px;line-height:1;font-variant-numeric:tabular-nums}
+.stat .cap{font-size:13px;color:var(--ink-2)}
+.grid-multi{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px}
+.mini{background:var(--surface);border:1px solid var(--rule);border-radius:10px;padding:12px 12px 6px;display:grid;gap:4px;min-width:0}
+.mini.is-def{border-color:var(--hl)} .mini.is-sum{border-style:dashed}
+.mini h3{margin:0;font:600 14px/1.25 var(--f-body);min-height:2.5em}
+.mini .row{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.mini .val{font-family:var(--f-data);font-size:20px;font-weight:500;font-variant-numeric:tabular-nums}
+.mini .yr{font-family:var(--f-data);font-size:12px;color:var(--ink-3)}
+.chip{font-family:var(--f-data);font-size:12px;padding:2px 7px;border-radius:999px;white-space:nowrap;font-variant-numeric:tabular-nums}
+.chip.up{color:var(--up);background:color-mix(in srgb,var(--up) 12%,transparent)}
+.chip.down{color:var(--down);background:color-mix(in srgb,var(--down) 12%,transparent)}
+.chip.flat{color:var(--ink-3);background:var(--grid)}
+.mini .note{font-size:12px;color:var(--ink-3);margin:0;min-height:2.6em}
+.mini svg{width:100%;height:auto;display:block;touch-action:pan-y}
+.def-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:end;gap:12px}
+.timeline{list-style:none;margin:0;padding:0;display:grid;gap:8px;font-size:13.5px;color:var(--ink-2)}
+.timeline li{display:grid;grid-template-columns:5.5em 1fr;gap:10px}
+.timeline time{font-family:var(--f-data);font-size:12px;color:var(--ink-3);padding-top:2px}
+.who{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+@media (max-width:820px){.who{grid-template-columns:1fr}}
+.who .panel h3{font-family:var(--f-display);font-size:19px}
+.rq,.limits{margin:0;padding-left:1.3em;display:grid;gap:6px;font-size:14.5px;color:var(--ink-2)}
+.who .panel p{margin:0;font-size:14px;color:var(--ink-2)}
+details{background:var(--surface);border:1px solid var(--rule);border-radius:10px;padding:12px 16px}
+summary{cursor:pointer;font-weight:500}
+.tbl{overflow-x:auto;margin-top:10px}
+table{border-collapse:collapse;font-family:var(--f-data);font-size:12px;font-variant-numeric:tabular-nums}
+th,td{padding:4px 8px;border-bottom:1px solid var(--grid);text-align:right;white-space:nowrap}
+th:first-child,td:first-child{text-align:left;position:sticky;left:0;background:var(--surface)}
+footer{font-size:12.5px;color:var(--ink-3);display:grid;gap:8px;border-top:1px solid var(--rule);padding-top:16px}
+footer p{margin:0;max-width:100ch}
+footer a,.prose a{color:var(--accent)}
+</style>
+
+<div class="wrap">
+<header>
+  <div class="eyebrow">Progetto di analisi economica · Tommaso Landi · ottobre 2026</div>
+  <h1>Prezzi, redditi e finanza pubblica in Italia</h1>
+  <p class="lead">Un'analisi descrittiva con dati Eurostat, Istat e Banca d'Italia. Il lavoro mette in relazione la dinamica recente dei prezzi al consumo, in particolare dell'energia, con l'andamento di lungo periodo di produttività, salari e redditi, e con la composizione e i saldi del bilancio pubblico.</p>
+  <div class="panel" style="gap:6px">
+    <h3>Domande di ricerca</h3>
+    <ol class="rq">
+      <li>L'aumento dei prezzi del 2026 ha caratteristiche simili a quello del 2022?</li>
+      <li>Come si sono evoluti produttività, salari reali e reddito disponibile dal 2000, e come si collocano rispetto agli altri grandi paesi dell'area dell'euro?</li>
+      <li>Quali vincoli pongono la composizione della spesa, la spesa per interessi e i saldi di bilancio alle politiche di sostegno ai redditi?</li>
+    </ol>
+  </div>
+  <p class="note" style="max-width:92ch"><b>Convenzioni.</b> Le variazioni dei prezzi sono <b>tendenziali</b>: ogni mese è confrontato con lo stesso mese dell'anno precedente; non si usano variazioni congiunturali (sul mese precedente) né da inizio anno. Le stime Istat per il 2026 sono <b>medie annue</b>. I grafici su PIL, salari e redditi sono <b>indici</b> con base dichiarata (2015=100 o 2000=100). Spesa e saldi pubblici sono in <b>% del PIL</b>. Sotto ogni grafico sono indicate unità e fonte.</p>
+  <div class="kpis">
+    <div class="kpi"><span class="n">+4,2%</span><span class="l">Prezzi al consumo (IPCA), variazione tendenziale di settembre 2026</span></div>
+    <div class="kpi"><span class="n">+22,6%</span><span class="l">Energia, variazione tendenziale di settembre 2026</span></div>
+    <div class="kpi"><span class="n">+1,9%</span><span class="l">Inflazione di fondo, variazione tendenziale di settembre 2026</span></div>
+    <div class="kpi"><span class="n">+1,8%</span><span class="l">PIL reale per ora lavorata, 2025 rispetto al 2000</span></div>
+    <div class="kpi"><span class="n">3,4%</span><span class="l">Indebitamento netto in % del PIL previsto per il 2027</span></div>
+  </div>
+</header>
+
+<nav class="toc" aria-label="Sezioni">
+  <a href="#prezzi"><span>01</span>Prezzi</a><a href="#energia"><span>02</span>Energia e accise</a><a href="#agricoltura"><span>03</span>Prezzi agricoli</a><a href="#pac"><span>04</span>Settore agricolo e PAC</a><a href="#lavoro"><span>05</span>Lavoro e produttività</a><a href="#salari"><span>06</span>Salari e redditi</a><a href="#spesa"><span>07</span>Spesa pubblica</a><a href="#difesa"><span>08</span>Difesa</a><a href="#conti"><span>09</span>Saldi e debito</a><a href="#sintesi"><span>10</span>Risultati e limiti</a><a href="#metodo"><span>11</span>Dati e fonti</a>
+</nav>
+
+<section class="chapter" id="prezzi">
+  <div class="chapter-head"><span class="num">01 · PREZZI</span><h2>Dinamica dei prezzi al consumo, 2019-2026</h2><p class="ask">l'aumento dei prezzi del 2026 è simile a quello del 2022?</p></div>
+  <div class="row">
+    <div class="panel">
+      <div class="controls"><div class="legend" id="lg-pr"></div>
+        <div class="seg" role="group" aria-label="Periodo"><button id="pr-all" aria-pressed="true">Dal 2019</button><button id="pr-26" aria-pressed="false">Dal 2025</button></div></div>
+      <div class="readout" id="ro-pr"></div>
+      <svg class="ch" id="ch-pr" viewBox="0 0 640 300" role="img" aria-label="Inflazione in Italia per componente, variazione tendenziale, 2019-2026"></svg>
+      <p class="note"><b>Unità:</b> variazione % tendenziale (mese sullo stesso mese dell'anno precedente). L'inflazione di fondo esclude energia e alimentari.<br><b>Fonte:</b> Eurostat, IPCA (prc_hicp_minr, classificazione ECOICOP 2), Italia, gennaio 2019 - settembre 2026.</p>
+    </div>
+    <div class="prose">
+      <p>Nel picco di ottobre 2022 l'inflazione era al <b>12,6%</b>, con l'energia a +71,7%. A settembre 2026 è al <b>4,2%</b>, con l'energia a +22,6%. L'aumento attuale è più contenuto e concentrato nei mesi successivi a marzo 2026.</p>
+      <p class="callout">La differenza principale riguarda l'inflazione di fondo. Nel ciclo precedente raggiunse il 5,5% a febbraio 2023, segnale di una trasmissione dei costi energetici a beni e servizi. A settembre 2026 è all'1,9%: nei dati disponibili questa trasmissione non è ancora visibile.</p>
+      <p>Anche i prezzi degli alimentari crescono in misura moderata (+1,9%). Poiché i costi di produzione si trasmettono ai prezzi al consumo con ritardo, il dato andrà verificato nei prossimi mesi (sezione 03).</p>
+    </div>
+  </div>
+</section>
+
+<section class="chapter" id="energia">
+  <div class="chapter-head"><span class="num">02 · ENERGIA E ACCISE</span><h2>Prezzi dell'energia e ruolo delle accise</h2><p class="ask">quali componenti energetiche guidano l'aumento, e che peso hanno le accise sul bilancio pubblico?</p></div>
+  <div class="row">
+    <div class="panel">
+      <div class="controls"><div class="legend" id="lg-en"></div>
+        <div class="seg" role="group" aria-label="Periodo"><button id="en-all" aria-pressed="true">Dal 2019</button><button id="en-26" aria-pressed="false">Dal 2025</button></div></div>
+      <div class="readout" id="ro-en"></div>
+      <svg class="ch" id="ch-en" viewBox="0 0 640 300" role="img" aria-label="Prezzi al consumo di gasolio e di elettricità e gas, variazione tendenziale"></svg>
+      <p class="note"><b>Unità:</b> variazione % tendenziale. Gasolio per autotrazione; elettricità e gas per uso domestico.<br><b>Fonte:</b> Eurostat, IPCA (prc_hicp_minr, voci CP07221 ed ELC_GAS), Italia.</p>
+    </div>
+    <div class="prose">
+      <p>Tra le componenti energetiche il <b>gasolio</b> registra l'aumento maggiore: +34,8% a settembre 2026. <b>Elettricità e gas</b> crescono del 19,1%, a fronte del +136,8% di ottobre 2022.</p>
+      <p class="callout">Le accise sono un'entrata tributaria dello Stato e concorrono al finanziamento della spesa pubblica. Tra gennaio e ottobre 2025 l'accisa sui prodotti energetici ha portato <b>20,8 miliardi</b>, più 2,0 dal gas naturale e 2,3 dall'energia elettrica. Su base annua l'accisa sui carburanti vale più di un punto di PIL.</p>
+      <p>Accisa e IVA rappresentano oltre la metà del prezzo del gasolio alla pompa. Una loro riduzione abbassa il prezzo finale, ma il minor gettito richiede una compensazione: maggiore indebitamento, minore spesa o altre entrate. Il beneficio, inoltre, è proporzionale ai consumi e non al reddito.</p>
+      <p class="note">Gettito: MEF, Bollettino delle entrate tributarie, gennaio-ottobre 2025. Peso delle tasse sul prezzo del gasolio (56,9% a fine 2025): dati del Ministero dell'Ambiente e della Sicurezza Energetica, elaborati da Assoutenti.</p>
+    </div>
+  </div>
+</section>
+
+<section class="chapter" id="agricoltura">
+  <div class="chapter-head"><span class="num">03 · ALIMENTARI E AGRICOLTURA</span><h2>Costi di produzione e prezzi agricoli</h2><p class="ask">come si muovono costi e prezzi lungo la filiera agroalimentare?</p></div>
+  <div class="row">
+    <div class="panel">
+      <h3>Variazioni tendenziali, ultimo mese disponibile</h3>
+      <svg class="ch" id="ch-fb" viewBox="0 0 640 230" role="img" aria-label="Costi agricoli, prezzi pagati agli agricoltori, prezzi alimentari e gasolio, variazione tendenziale"></svg>
+      <p class="note"><b>Unità:</b> variazione % tendenziale. Tre voci si riferiscono a settembre 2026; i costi dei mezzi di produzione agricoli ad agosto 2026, ultimo dato diffuso, e sono mostrati a parte.<br><b>Fonte:</b> costi e prezzi agricoli, Ismea (indici dei mezzi correnti di produzione e dei prezzi all'origine), dati riportati da Coldiretti e Cia, ottobre 2026; alimentari e gasolio, Eurostat IPCA.</p>
+    </div>
+    <div class="prose">
+      <p>Ad agosto i costi dei mezzi di produzione agricoli erano dell'<b>8,4%</b> più alti di un anno prima. A settembre i prezzi pagati agli agricoltori erano più bassi del <b>3,5%</b>, con l'olio d'oliva a −42% e la frutta a −11,4%. Nello stesso mese i prezzi degli alimentari al consumo crescevano dell'1,9%.</p>
+      <p class="callout">L'andamento opposto di costi e prezzi all'origine indica una compressione dei margini nella fase agricola. Il fatto che i prezzi al consumo crescano poco suggerisce che, per ora, la differenza sia assorbita dalle fasi a valle della filiera.</p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="panel">
+      <h3>PAC 2028-2034: la dotazione per l'Italia</h3>
+      <svg class="ch" id="ch-pac" viewBox="0 0 520 190" role="img" aria-label="Dotazione PAC per l'Italia: ciclo precedente, proposta iniziale e proposta rivista"></svg>
+      <p class="note"><b>Unità:</b> miliardi di euro nominali sull'intero ciclo di sette anni, non deflazionati.<br><b>Fonte:</b> Commissione europea, proposte di quadro finanziario pluriennale 2028-2034 (luglio 2025 e revisione successiva), cifre per l'Italia elaborate da QuiFinanza (gennaio 2026).</p>
+    </div>
+    <div class="prose">
+      <p>La prima proposta della Commissione riduceva la dotazione italiana a <b>31 miliardi</b>, contro i 37,7 del ciclo precedente. Dopo l'aggiunta di 45 miliardi a livello europeo, la cifra per l'Italia è salita a circa <b>40,7 miliardi</b>. Il negoziato sul bilancio europeo dovrebbe chiudersi tra la fine del 2026 e il 2027.</p>
+      <p>La sezione successiva esamina alcuni aspetti strutturali del settore che incidono sull'efficacia di questi fondi.</p>
+    </div>
+  </div>
+</section>
+
+<section class="chapter" id="pac">
+  <div class="chapter-head"><span class="num">04 · PAC</span><h2>Struttura del settore agricolo e politica agricola comune</h2><p class="ask">in che misura i pagamenti diretti della PAC si traducono in reddito per chi coltiva?</p></div>
+  <p class="lead" style="font-size:15px">I pagamenti diretti della PAC sono in gran parte erogati per ettaro. La sezione esamina quattro aspetti rilevanti per valutarne l'efficacia: la capitalizzazione dei pagamenti nel valore della terra, la dimensione delle aziende, il valore aggiunto per occupato e l'incidenza del lavoro irregolare.</p>
+  <div class="two">
+    <div class="panel">
+      <h3>1. Capitalizzazione dei pagamenti in affitti e valori fondiari</h3>
+      <svg class="ch" id="ch-cap" viewBox="0 0 520 220" role="img" aria-label="Quota dei pagamenti diretti disaccoppiati che si trasferisce su affitti e valori dei terreni, stime UE"></svg>
+      <p class="note"><b>Unità:</b> centesimi trasferiti su affitti o valori dei terreni per ogni euro di pagamento diretto disaccoppiato. Barre: intervallo delle stime; punti: media degli studi precedenti.<br><b>Fonte:</b> Baldoni e Ciaian, Joint Research Centre della Commissione europea, 2021 (dati della rete contabile agricola FADN, 1989-2016).</p>
+    </div>
+    <div class="prose">
+      <p>Quando il pagamento è legato alla superficie, una parte può trasferirsi ai proprietari attraverso affitti più alti. Nell'UE, secondo il Joint Research Centre, nel breve periodo tra <b>9 e 46 centesimi</b> per ogni euro di pagamento disaccoppiato si traducono in affitti più alti, fino a 55 centesimi nel lungo periodo. La media degli studi precedenti è di circa 50 centesimi.</p>
+      <p>Ne segue che un aumento dei pagamenti può tradursi in parte in un aumento di affitti e valori fondiari, con un trasferimento di beneficio dagli affittuari ai proprietari e maggiori costi di ingresso nel settore.</p>
+      <p class="callout">Per l'Italia le prove sono più deboli: uno studio su dati provinciali (Valenti e altri, 2020) non trova un effetto significativo sui valori dei terreni. Il meccanismo è solido a livello europeo, la sua intensità in Italia è incerta.</p>
+    </div>
+  </div>
+  <div class="two">
+    <div class="panel">
+      <h3>2. Dimensione media delle aziende</h3>
+      <svg class="ch" id="ch-size" viewBox="0 0 520 200" role="img" aria-label="Superficie agricola media per azienda, Italia, UE, Germania e Francia"></svg>
+      <p class="note"><b>Unità:</b> ettari di superficie agricola utilizzata per azienda, 2023.<br><b>Fonte:</b> Italia, Eurostat (ef_m_farmleg, aziende sopra la soglia statistica); UE, Eurostat (Farms and farmland in the European Union, 2023); Germania e Francia, intervallo indicato da Istat.</p>
+    </div>
+    <div class="panel">
+      <h3>3. Valore aggiunto per occupato</h3>
+      <div class="seg" role="group" aria-label="Misura" style="justify-self:start"><button id="va-rel" aria-pressed="true">% della media dell'economia</button><button id="va-abs" aria-pressed="false">Migliaia di euro</button></div>
+      <svg class="ch" id="ch-va" viewBox="0 0 520 210" role="img" aria-label="Valore aggiunto per occupato in agricoltura, confronto tra paesi"></svg>
+      <p class="note" id="nt-va"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="panel">
+      <h3>4. Lavoro irregolare per settore</h3>
+      <svg class="ch" id="ch-irr" viewBox="0 0 640 240" role="img" aria-label="Tasso di irregolarità del lavoro per settore, Italia 2024"></svg>
+      <p class="note"><b>Unità:</b> unità di lavoro irregolari in % del totale del settore, 2024.<br><b>Fonte:</b> Istat, Economia non osservata nei conti nazionali, anni 2021-2024 (16 ottobre 2026). La ristorazione è inclusa nell'aggregato commercio, trasporti, alloggio e ristorazione; il lavoro domestico negli altri servizi alle persone.</p>
+    </div>
+    <div class="prose">
+      <p>Le aziende italiane hanno in media <b>10,5 ettari</b>, contro 17,8 nell'UE e 60-70 in Germania e Francia. Superfici ridotte rendono più difficile ammortizzare investimenti in macchinari, irrigazione e tecnologie, e limitano l'importo del pagamento per ettaro ricevuto da ciascuna azienda.</p>
+      <p>Il valore aggiunto per occupato in agricoltura è di circa <b>46.600 euro</b>, il <b>62%</b> della media dell'economia italiana. Il livello è superiore alla media UE, su cui incidono Polonia e Romania, ma inferiore a quello di Francia (53.000), Spagna (55.900) e Germania (68.400).</p>
+      <p>In agricoltura il tasso di irregolarità del lavoro è del <b>18,4%</b>, contro il 13,1% dell'intera economia. Valori elevati si osservano anche nelle costruzioni (13,6%), in commercio, trasporti, alloggio e ristorazione (15,5%) e negli altri servizi alle persone, che comprendono il lavoro domestico (41,4%). Il dato è rilevante per la condizionalità sociale dei pagamenti, introdotta nella PAC 2023-2027.</p>
+      <p class="note">Per completezza: la PAC ha anche l'obiettivo di stabilizzare redditi molto variabili e di remunerare beni pubblici come la cura del territorio e del paesaggio; in collina e montagna, che coprono gran parte del Paese, la dimensione ridotta delle aziende dipende anche da vincoli geografici. Questi dati riguardano quindi soprattutto il disegno degli strumenti, più che l'entità dei fondi.</p>
+    </div>
+  </div>
+</section>
+
+<section class="chapter" id="lavoro">
+  <div class="chapter-head"><span class="num">05 · LAVORO E PRODUTTIVITÀ</span><h2>Occupazione, ore lavorate e produttività</h2><p class="ask">quali fattori spiegano la crescita del PIL dal 2019?</p></div>
+  <div class="row">
+    <div class="panel">
+      <div class="controls">
+        <div class="legend" id="lg-q"></div>
+        <div class="seg" role="group" aria-label="Vista"><button id="q-lev" aria-pressed="true">Livelli</button><button id="q-rat" aria-pressed="false">Rapporti</button></div>
+      </div>
+      <div class="readout" id="ro-q"></div>
+      <svg class="ch" id="ch-q" viewBox="0 0 640 300" role="img" aria-label="PIL reale, ore lavorate e occupati in Italia, indice 2015=100"></svg>
+      <p class="note" id="nt-q"></p>
+    </div>
+    <div class="prose">
+      <p>Dal quarto trimestre 2019 al secondo trimestre 2026 il PIL reale è cresciuto dell'<b>8,7%</b>, le ore lavorate del <b>10,2%</b> e gli occupati del <b>7,2%</b>. Il PIL per ora lavorata è sceso dell'<b>1,3%</b>. La crescita del periodo è quindi spiegata dall'aumento dell'input di lavoro più che da quello della produttività.</p>
+      <p class="callout">Con la revisione dei conti nazionali di settembre 2026, crescita degli occupati e crescita del PIL sono tornate in buona parte coerenti. Restano due anomalie: il balzo della produttività nel 2021-22 e la debolezza del PIL dal 2022, nonostante l'ampio sostegno fiscale.</p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="panel">
+      <div class="legend" id="lg-p"></div>
+      <div class="readout" id="ro-p"></div>
+      <svg class="ch" id="ch-p" viewBox="0 0 640 300" role="img" aria-label="Produttività reale per ora lavorata, Italia e confronto europeo, 2000=100"></svg>
+      <p class="note"><b>Unità:</b> indice, 2000=100; PIL reale per ora lavorata, dati annuali.<br><b>Fonte:</b> Eurostat (nama_10_lp_ulc). Area dell'euro a 20 paesi.</p>
+    </div>
+    <div class="prose">
+      <p>Nel 2025 un'ora di lavoro in Italia produce l'<b>1,8% in più che nel 2000</b>. Nello stesso periodo la produttività oraria è cresciuta del 23% in Germania, del 19% in Spagna, del 17% in Francia e del 20% nell'area dell'euro.</p>
+      <p>La stagnazione della produttività oraria è il principale fattore che limita, nel lungo periodo, la crescita dei salari reali (sezione 06).</p>
+    </div>
+  </div>
+</section>
+
+<section class="chapter" id="salari">
+  <div class="chapter-head"><span class="num">06 · SALARI E REDDITI</span><h2>Salari reali e reddito disponibile</h2><p class="ask">come si sono evoluti salari e redditi reali dal 2000?</p></div>
+  <div class="row">
+    <div class="panel">
+      <div class="controls">
+        <div class="legend" id="lg-w"></div>
+        <div class="seg" role="group" aria-label="Deflatore"><button id="w-defl" aria-pressed="true">Deflatore dei consumi</button><button id="w-hicp" aria-pressed="false">Prezzi al consumo (IPCA)</button></div>
+      </div>
+      <div class="readout" id="ro-w"></div>
+      <svg class="ch" id="ch-w" viewBox="0 0 640 300" role="img" aria-label="Salari reali per ora e per dipendente e produttività oraria, Italia, 2000=100"></svg>
+      <p class="note"><b>Unità:</b> indice, 2000=100, dati annuali. Linee continue: redditi da lavoro dipendente per ora lavorata e per dipendente, deflazionati. Linea tratteggiata: PIL reale per ora lavorata.<br><b>Fonte:</b> Eurostat (nama_10_lp_ulc, nama_10_gdp per il deflatore dei consumi, prc_hicp_aind per l'IPCA).</p>
+    </div>
+    <div class="prose">
+      <p>Il salario reale per ora lavorata è circa al livello del 2000: −0,6% con il deflatore dei consumi, −2,6% con l'IPCA. L'andamento è coerente con quello della produttività oraria.</p>
+      <p class="callout">Il recupero successivo al 2022-23 risulta interrotto. Secondo le stime Istat, nella media del 2026 le retribuzioni contrattuali cresceranno del 2,5% e i prezzi del 3,0%. Il recupero sui prezzi, iniziato alla fine del 2023, si è fermato nel secondo trimestre 2026.</p>
+      <p class="note">Fonte delle stime: Istat, audizione sul Documento programmatico di finanza pubblica, 12 ottobre 2026. Con dati AMECO e deflatore dei consumi privati, Ascari e Trezzi stimano circa +10% dal 2000: in ogni caso, in 25 anni la crescita è vicina a zero.</p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="panel">
+      <div class="legend" id="lg-y"></div>
+      <div class="readout" id="ro-y"></div>
+      <svg class="ch" id="ch-y" viewBox="0 0 640 280" role="img" aria-label="Reddito disponibile lordo reale delle famiglie, aggregato e per abitante, 2000=100"></svg>
+      <p class="note"><b>Unità:</b> indice, 2000=100, dati annuali. Reddito disponibile lordo di famiglie e istituzioni senza scopo di lucro, deflazionato con il deflatore dei consumi.<br><b>Fonte:</b> Eurostat (nasa_10_nf_tr, nama_10_gdp, nama_10_pe).</p>
+    </div>
+    <div class="panel">
+      <h3>Reddito disponibile per abitante, Italia rispetto all'UE</h3>
+      <div class="readout" id="ro-r"></div>
+      <svg class="ch" id="ch-r" viewBox="0 0 420 260" role="img" aria-label="Reddito disponibile per abitante in standard di potere d'acquisto, Italia in percentuale della media UE"></svg>
+      <p class="note"><b>Unità:</b> Italia in % della media UE27 (UE=100), in standard di potere d'acquisto.<br><b>Fonte:</b> Eurostat (tec00113).</p>
+    </div>
+  </div>
+  <div class="prose" style="max-width:80ch"><p>Al netto dell'inflazione, il reddito disponibile per abitante è <b>dell'1% inferiore al 2000</b>, dopo un minimo nel 2013 di quasi 10 punti più basso. A parità di potere d'acquisto l'Italia è scesa dal 101% al 96% della media europea in poco più di dieci anni.</p></div>
+</section>
+
+<section class="chapter" id="spesa">
+  <div class="chapter-head"><span class="num">07 · SPESA PUBBLICA</span><h2>Composizione della spesa pubblica</h2><p class="ask">come è cambiata la composizione della spesa pubblica dal 1995?</p></div>
+  <p class="lead" style="font-size:15px">Nel 2024 la spesa pubblica è stata pari al <b>50,4% del PIL</b> (51,1% nel 2025, dato provvisorio). Dal 2001 sono cresciute soprattutto le <b>pensioni</b> e l'<b>altra protezione sociale</b>; sono scesi <b>interessi</b>, <b>servizi generali</b> e <b>istruzione</b>. Pensioni e interessi insieme valgono circa il 20% del PIL, una quota largamente predeterminata da norme e impegni pregressi.</p>
+  <div class="controls">
+    <div class="seg" role="group" aria-label="Unità di misura"><button id="u-pil" aria-pressed="true">% del PIL</button><button id="u-share" aria-pressed="false">% della spesa totale</button></div>
+    <span class="note">Passando sopra un grafico si legge lo stesso anno in tutti i pannelli.</span>
+  </div>
+  <div class="two">
+    <div class="panel">
+      <h3>Spesa pubblica totale</h3>
+      <div class="stats"><div class="stat"><span class="big" id="tot-val">50,4%</span><span class="cap" id="tot-cap">del PIL nel 2024</span></div></div>
+      <svg id="total" viewBox="0 0 520 230" role="img" aria-label="Spesa pubblica totale in percentuale del PIL dal 1995 al 2025"></svg>
+      <p class="note"><b>Unità:</b> % del PIL, 1995-2025; il 2025 è provvisorio.<br><b>Fonte:</b> Eurostat (gov_10a_main).</p>
+    </div>
+    <div class="panel">
+      <h3>Cosa sale e cosa scende</h3>
+      <p class="note" id="delta-sub"></p>
+      <div class="legend"><span class="bar" style="--c:var(--up)">Aumenta</span><span class="bar" style="--c:var(--down)">Diminuisce</span></div>
+      <svg id="delta" viewBox="0 0 460 330" role="img" aria-label="Variazione delle componenti di spesa tra 2001 e 2024"></svg>
+      <p class="note"><b>Fonte:</b> Eurostat, spesa per funzione COFOG (gov_10a_exp).</p>
+    </div>
+  </div>
+  <p class="note" id="multi-sub"></p>
+  <div class="grid-multi" id="multi"></div>
+  <p class="note"><b>Fonte:</b> Eurostat, spesa delle amministrazioni pubbliche per funzione COFOG (gov_10a_exp); interessi 1995-2000 da gov_10a_main.</p>
+  <details><summary>Tabella dei dati sulla spesa per funzione</summary><div class="tbl" id="tbl"></div></details>
+</section>
+
+<section class="chapter" id="difesa">
+  <div class="chapter-head"><span class="num">08 · DIFESA</span><h2>Spesa per la difesa: definizioni a confronto</h2><p class="ask">quanto dell'aumento del 2025 riflette maggiore spesa e quanto riclassificazioni?</p></div>
+  <div class="panel">
+    <div class="def-head">
+      <p class="note" style="max-width:70ch">Nel 2025 l'aumento viene soprattutto dalla voce "Altro", dove secondo l'Osservatorio sui conti pubblici italiani confluisce gran parte delle riclassificazioni (Guardia di Finanza, Capitanerie di porto, spazio, cyber).</p>
+      <div class="seg" role="group" aria-label="Prezzi"><button id="d-nom" aria-pressed="true">Nominale</button><button id="d-real" aria-pressed="false">Reale, prezzi 2021</button></div>
+    </div>
+    <div class="legend"><span class="bar" style="--c:var(--c1)">Personale</span><span class="bar" style="--c:var(--c2)">Armamenti</span><span class="bar" style="--c:var(--c3)">Infrastrutture</span><span class="bar" style="--c:var(--c4)">Altro</span></div>
+    <div class="readout" id="def-readout"></div>
+    <svg id="defbars" viewBox="0 0 900 300" role="img" aria-label="Composizione della spesa militare italiana nella definizione NATO, 2014-2025"></svg>
+    <p class="note"><b>Unità:</b> miliardi di euro, a prezzi correnti o a prezzi 2021.<br><b>Fonte:</b> Osservatorio sui conti pubblici italiani (Università Cattolica), elaborazioni su dati NATO. Il perimetro NATO (2,01% del PIL nel 2025) è più ampio della funzione difesa COFOG del capitolo 07 (1,3%) e i due dati non vanno confrontati.</p>
+  </div>
+</section>
+
+<section class="chapter" id="conti">
+  <div class="chapter-head"><span class="num">09 · DEFICIT, DEBITO E MANOVRA</span><h2>Saldi di bilancio, spesa per interessi e manovra 2027</h2><p class="ask">quali margini lasciano i saldi programmati e la spesa per interessi?</p></div>
+  <div class="row">
+    <div class="panel">
+      <div class="legend"><span class="bar" style="--c:var(--c1)">Saldo primario</span><span class="bar" style="--c:var(--c2)">Indebitamento netto</span><span style="--c:var(--ink-3)">Soglia del 3%</span></div>
+      <div class="readout" id="ro-f"></div>
+      <svg class="ch" id="ch-f" viewBox="0 0 640 300" role="img" aria-label="Indebitamento netto e saldo primario in percentuale del PIL, 2019-2029"></svg>
+      <p class="note"><b>Unità:</b> % del PIL. Dal 2026 scenario programmatico (barre più chiare). La distanza tra le due barre è la spesa per interessi.<br><b>Fonte:</b> Istat e Banca d'Italia, figura del Documento programmatico di bilancio 2027.</p>
+    </div>
+    <div class="panel">
+      <h3>Manovra 2027: saldo lordo e netto</h3>
+      <div class="tiles">
+        <div class="tile"><span class="n">23,5</span><span class="l">mld lordi di misure</span></div>
+        <div class="tile"><span class="n">~10</span><span class="l">mld di coperture</span></div>
+        <div class="tile"><span class="n">~13</span><span class="l">mld netti in deficit</span></div>
+      </div>
+      <svg class="ch" id="ch-m" viewBox="0 0 420 210" role="img" aria-label="Principali misure lorde della manovra 2027 in miliardi"></svg>
+      <p class="note"><b>Unità:</b> miliardi di euro, misure lorde 2027.<br><b>Fonte:</b> Documento programmatico di bilancio 2027, importi ricostruiti da Pagella Politica.</p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="panel">
+      <div class="readout" id="ro-int"></div>
+      <svg class="ch" id="ch-int" viewBox="0 0 640 240" role="img" aria-label="Spesa per interessi in percentuale del PIL, 1995-2025"></svg>
+      <p class="note"><b>Unità:</b> % del PIL, dati annuali.<br><b>Fonte:</b> Eurostat, interessi passivi delle amministrazioni pubbliche (gov_10a_main, D.41). Previsioni: Documento programmatico di bilancio 2027.</p>
+    </div>
+    <div class="prose">
+      <p>La spesa per interessi è scesa dall'<b>11,1%</b> del PIL nel 1995 al 3,3% nel 2019. Nel 2025 è risalita al <b>3,8%</b> e, secondo il Documento programmatico di bilancio, arriverà al 4,7% nel 2029, perché i titoli emessi a tassi bassi vengono rinnovati a tassi più alti.</p>
+      <p>Sul fronte delle entrate la pressione fiscale è al <b>42,9%</b> del PIL nel 2025, 0,7 punti più del 2024 (Istat). I margini per nuove misure sono quindi limitati da tre fattori: spesa per interessi in crescita, pressione fiscale già elevata e spesa pensionistica rigida.</p>
+    </div>
+  </div>
+  <div class="prose" style="max-width:80ch">
+    <p>Tra il 2020 e il 2023 il deficit è stato fra il 7% e il 9,4% del PIL, con un saldo primario negativo: il sostegno pubblico ha accompagnato la ripresa di domanda e occupazione, senza effetti visibili sulla produttività. Oggi il saldo primario è positivo, ma gli interessi assorbono circa il 4% del PIL.</p>
+    <p>La manovra vale 23,5 miliardi lordi e circa 13 netti, dopo le coperture (banche e assicurazioni circa 5 miliardi, tagli ai ministeri circa 1,5, giochi 0,7). Il deficit del 2027 passa dal 2,9% al 3,4% del PIL. Per difesa ed energia il governo ricorre alla clausola europea, fino allo 0,3% del PIL ciascuna, circa 7 miliardi l'una: la clausola consente maggiore indebitamento nazionale e non comporta trasferimenti europei.</p>
+  </div>
+</section>
+
+<section class="chapter" id="sintesi">
+  <div class="chapter-head"><span class="num">10 · RISULTATI E LIMITI</span><h2>Sintesi dei risultati e limiti dell'analisi</h2></div>
+  <div class="who">
+    <div class="panel"><h3>Domanda 1 · Prezzi</h3><p>L'aumento del 2026 è concentrato nell'energia, in particolare nel gasolio. A differenza del 2022 l'inflazione di fondo resta vicina al 2% e i prezzi alimentari crescono poco, mentre nella fase agricola costi e prezzi all'origine si muovono in direzioni opposte.</p></div>
+    <div class="panel"><h3>Domanda 2 · Redditi</h3><p>Dal 2000 la produttività oraria è cresciuta dell'1,8%, contro il 17-23% di Francia, Spagna e Germania. Salari orari reali e reddito disponibile per abitante sono vicini ai livelli del 2000. La crescita recente del PIL è spiegata soprattutto dall'aumento delle ore lavorate.</p></div>
+    <div class="panel"><h3>Domanda 3 · Bilancio pubblico</h3><p>Pensioni e interessi assorbono circa il 40% della spesa. La spesa per interessi è prevista in aumento fino al 4,7% del PIL nel 2029 e il deficit risale al 3,4% nel 2027. Misure come il taglio delle accise riducono entrate che finanziano la spesa e richiedono una copertura.</p></div>
+  </div>
+  <div class="panel">
+    <h3>Limiti</h3>
+    <ul class="limits">
+      <li>L'analisi è descrittiva: le relazioni mostrate non vanno interpretate come effetti causali.</li>
+      <li>I dati Ismea su costi e prezzi agricoli sono ripresi dalle organizzazioni agricole e non scaricati dalla fonte; i mesi di riferimento non coincidono.</li>
+      <li>Il gettito annuo delle accise è stimato a partire da dieci mesi di dati.</li>
+      <li>Salari reali e produttività dipendono dal deflatore e dalla fonte: con dati AMECO i salari orari reali risultano circa +10% dal 2000.</li>
+      <li>I dati 2025 e 2026 sono in parte provvisori e soggetti a revisione; i saldi dal 2026 sono previsioni del governo.</li>
+    </ul>
+  </div>
+</section>
+
+<footer id="metodo">
+  <p><b>Metodo.</b> Analisi descrittiva di serie storiche ufficiali. Le variazioni dei prezzi sono tendenziali (mese sullo stesso mese dell'anno precedente). Gli indici hanno base 2015=100 (dati trimestrali) o 2000=100 (dati annuali). I valori reali sono deflazionati con il deflatore dei consumi delle famiglie o con l'IPCA, come indicato. I dati Eurostat sono stati estratti il 21 ottobre 2026.</p>
+  <p><b>Prezzi:</b> Eurostat prc_hicp_minr (IPCA, ECOICOP 2). <b>Lavoro, produttività, redditi:</b> Eurostat namq_10_gdp, namq_10_a10_e, nama_10_lp_ulc, nama_10_gdp, prc_hicp_aind, nasa_10_nf_tr, nama_10_pe, tec00113. <b>Spesa pubblica:</b> Eurostat gov_10a_exp (COFOG) e gov_10a_main. <b>Difesa:</b> Osservatorio sui conti pubblici italiani su dati NATO. <b>Saldi di bilancio e manovra:</b> Istat, Banca d'Italia, Documento programmatico di bilancio 2027; <a href="https://pagellapolitica.it/articoli/governo-dpb-legge-bilancio-2027">Pagella Politica</a>. <b>Accise:</b> MEF, Bollettino delle entrate tributarie. <b>Retribuzioni:</b> Istat, audizione del 12 ottobre 2026.</p>
+  <p><b>Agricoltura e PAC:</b> Ismea (dati riportati dalle organizzazioni agricole); Commissione europea, proposte QFP 2028-2034; Baldoni e Ciaian, Joint Research Centre 2021; Eurostat ef_m_farmleg, nama_10_a10, nama_10_a10_e; Istat, Economia non osservata nei conti nazionali 2021-2024. Confronti di lungo periodo: G. Ascari e R. Trezzi, <a href="https://ildeclinoitaliano.it/#contenuti">Fotografia di un declino</a>.</p>
+  <p><b>Avvertenze.</b> I dati Ismea non sono stati scaricati alla fonte ma ripresi dalle organizzazioni agricole. La difesa COFOG e quella NATO hanno perimetri diversi. "Pensioni" indica le funzioni COFOG vecchiaia e superstiti; le pensioni di invalidità rientrano nell'altra protezione sociale, che comprende anche il bonus da 80/100 euro, registrato come prestazione sociale. I redditi da lavoro per ora sono pubblicati da Eurostat con un decimale.</p>
+</footer>
+</div>
+
+<script>
+
+(()=>{
+const PR={"m":["2019-01","2019-02","2019-03","2019-04","2019-05","2019-06","2019-07","2019-08","2019-09","2019-10","2019-11","2019-12","2020-01","2020-02","2020-03","2020-04","2020-05","2020-06","2020-07","2020-08","2020-09","2020-10","2020-11","2020-12","2021-01","2021-02","2021-03","2021-04","2021-05","2021-06","2021-07","2021-08","2021-09","2021-10","2021-11","2021-12","2022-01","2022-02","2022-03","2022-04","2022-05","2022-06","2022-07","2022-08","2022-09","2022-10","2022-11","2022-12","2023-01","2023-02","2023-03","2023-04","2023-05","2023-06","2023-07","2023-08","2023-09","2023-10","2023-11","2023-12","2024-01","2024-02","2024-03","2024-04","2024-05","2024-06","2024-07","2024-08","2024-09","2024-10","2024-11","2024-12","2025-01","2025-02","2025-03","2025-04","2025-05","2025-06","2025-07","2025-08","2025-09","2025-10","2025-11","2025-12","2026-01","2026-02","2026-03","2026-04","2026-05","2026-06","2026-07","2026-08","2026-09"],"TOTAL":[1.0,1.1,1.1,1.1,1.0,0.7,0.2,0.5,0.2,0.2,0.2,0.5,0.4,0.1,0.1,0.1,-0.4,-0.4,0.7,-0.5,-1.1,-0.6,-0.4,-0.2,0.7,1.0,0.5,0.8,1.2,1.3,1.1,2.4,2.9,3.2,4.0,4.2,5.0,6.2,6.9,6.4,7.3,8.5,8.4,9.1,9.5,12.6,12.5,12.2,10.7,9.8,8.0,8.6,8.0,6.8,6.3,5.6,5.6,1.8,0.6,0.6,0.9,0.8,1.2,0.9,0.7,0.9,1.6,1.3,0.7,1.0,1.4,1.3,1.7,1.7,2.1,2.0,1.7,1.7,1.7,1.6,1.7,1.3,1.1,1.2,1.0,1.5,1.6,2.8,3.2,3.0,2.9,3.2,4.2],"NRG":[3.9,4.3,5.5,5.0,4.5,2.7,-1.8,-2.0,-2.9,-4.7,-4.7,-2.2,-2.2,-3.4,-5.7,-9.8,-13.1,-12.4,-10.6,-10.4,-10.1,-9.0,-8.8,-7.9,-4.9,-3.3,0.3,9.8,14.1,14.2,18.8,20.1,20.4,25.5,31.0,29.4,39.0,46.6,51.4,40.0,43.0,49.4,43.4,45.3,44.8,71.7,68.2,65.2,42.7,28.2,10.8,16.4,11.5,2.0,0.6,-0.2,1.6,-20.0,-24.6,-24.9,-20.6,-17.4,-10.8,-12.2,-11.7,-8.5,-4.0,-6.1,-8.6,-8.9,-5.4,-2.8,-0.8,0.7,2.7,-0.8,-1.9,-2.1,-3.5,-4.8,-3.7,-4.5,-4.1,-4.5,-6.2,-6.6,-2.1,9.3,12.0,12.9,11.7,17.1,22.6],"FOOD":[0.8,1.9,1.3,0.5,0.6,0.5,0.9,1.0,0.8,0.9,0.9,1.0,1.0,0.6,1.5,2.9,2.7,2.4,1.5,1.1,1.3,1.5,1.5,1.0,0.6,0.5,0.0,-0.5,-0.7,-0.5,0.1,0.8,1.0,1.0,1.2,2.4,3.2,4.3,5.0,5.5,6.4,8.0,8.6,9.2,10.2,11.8,12.0,11.7,11.0,11.9,11.9,11.1,10.8,10.0,9.9,9.1,8.1,6.2,5.6,5.5,5.4,3.6,2.8,2.7,2.1,1.7,1.2,1.1,1.4,2.5,2.8,2.2,2.2,2.5,2.7,3.1,3.1,3.3,3.8,3.8,3.5,2.4,1.8,2.3,2.2,2.5,2.7,2.9,2.5,1.8,1.4,1.3,1.9],"CORE":[0.6,0.5,0.3,0.7,0.5,0.5,0.3,0.6,0.5,0.7,0.8,0.7,0.5,0.5,0.5,0.6,0.6,0.4,2.1,0.2,-0.6,-0.1,0.2,0.2,1.3,1.5,0.7,0.2,0.1,0.2,-0.9,0.8,1.5,1.1,1.2,1.6,1.3,1.7,1.8,2.2,3.0,3.5,3.4,4.1,4.2,4.6,4.7,4.9,5.3,5.5,5.3,5.3,5.2,5.0,4.7,4.0,4.2,3.9,3.3,3.0,2.8,2.5,2.3,2.2,2.2,2.1,2.4,2.4,1.8,1.8,2.0,1.7,1.8,1.6,1.8,2.1,1.8,2.0,2.0,1.9,2.1,1.9,1.8,1.9,1.8,2.7,1.8,1.7,2.0,1.7,1.8,1.7,1.9],"DIESEL":[0.7,1.7,5.3,4.4,2.8,-1.2,-1.3,-1.8,-3.6,-4.0,-4.7,0.3,3.9,0.5,-4.9,-10.5,-16.2,-14.9,-12.1,-11.7,-11.7,-13.9,-13.9,-11.9,-9.5,-5.5,1.6,8.2,15.0,15.6,16.2,17.0,17.9,23.5,28.0,23.2,20.0,23.8,34.6,23.2,25.2,32.4,30.9,18.2,19.8,16.7,13.3,9.5,13.9,8.8,-6.9,-1.8,-8.7,-14.4,-14.6,0.6,3.5,3.2,-1.3,-0.6,-6.0,-2.8,-0.1,2.4,4.9,2.2,3.0,-5.8,-12.7,-14.0,-9.7,-5.2,-1.7,-4.5,-6.0,-8.9,-9.0,-5.2,-4.2,-3.5,-0.4,-0.1,2.1,1.0,-2.1,-1.4,12.5,27.7,25.3,21.6,18.7,26.7,34.8],"ELGAS":[8.1,7.9,7.6,6.7,6.7,6.7,-1.9,-1.6,-1.7,-4.8,-4.8,-4.6,-6.9,-7.1,-7.1,-10.3,-11.1,-11.1,-10.3,-10.1,-10.0,-5.7,-5.4,-5.3,-1.9,-1.7,-1.3,11.5,13.6,13.6,22.3,23.4,23.4,26.9,33.9,34.7,57.7,69.9,72.1,60.7,64.9,69.3,59.3,76.8,78.0,136.8,131.6,126.3,67.9,41.0,17.5,21.2,18.1,5.8,2.5,-11.2,-11.6,-39.2,-42.6,-42.4,-33.9,-29.9,-20.0,-23.7,-24.6,-17.3,-9.1,-6.3,-5.9,-6.4,-4.3,-2.6,-1.3,3.3,9.0,6.2,4.9,1.5,-1.9,-4.8,-5.3,-6.8,-7.1,-7.3,-7.2,-7.8,-6.6,6.1,7.9,11.2,10.7,14.4,19.1]};
+const NS="http://www.w3.org/2000/svg";
+const el=(t,a={},p)=>{const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);if(p)p.appendChild(e);return e};
+const fmt=(v,d=1)=>v==null?"–":v.toLocaleString("it-IT",{minimumFractionDigits:d,maximumFractionDigits:d});
+const MES=["gen","feb","mar","apr","mag","giu","lug","ago","set","ott","nov","dic"];
+const mlab=m=>MES[+m.slice(5)-1]+" "+m.slice(0,4);
+const legend=(id,series)=>{document.getElementById(id).innerHTML=series.map(s=>`<span style="--c:var(${s.c})">${s.name}</span>`).join("")};
+function lineChart(svg,opt){
+  svg.innerHTML="";
+  const vb=svg.viewBox.baseVal, W=vb.width, H=vb.height, L=40, R=opt.endLabels?112:14, T=12, B=26;
+  const n=opt.x.length;
+  const lo=opt.lo, hi=opt.hi;
+  const x=i=>L+(W-L-R)*i/(n-1), y=v=>T+(H-T-B)*(hi-v)/(hi-lo);
+  for(let v=lo;v<=hi+1e-9;v+=opt.step){const z=Math.abs(v)<1e-9;el("line",{x1:L,x2:W-R,y1:y(v),y2:y(v),stroke:z?"var(--ink-3)":"var(--grid)"},svg);const t=el("text",{x:L-6,y:y(v)+4,"text-anchor":"end"},svg);t.textContent=fmt(v,0);}
+  opt.ticks.forEach(i=>{const t=el("text",{x:x(i),y:H-7,"text-anchor":"middle"},svg);t.textContent=opt.tickLabel(i);});
+  if(opt.band){const [a,b,lab]=opt.band;el("rect",{x:x(a),y:T,width:x(b)-x(a),height:H-T-B,fill:"var(--grid)","fill-opacity":.7},svg);const t=el("text",{x:x(a)+4,y:T+12},svg);t.textContent=lab;}
+  const ends=[];
+  opt.series.forEach(s=>{let d="";s.data.forEach((v,i)=>{d+=(i?"L":"M")+x(i).toFixed(1)+" "+y(Math.max(lo,Math.min(hi,v))).toFixed(1)});
+    el("path",{d,fill:"none",stroke:`var(${s.c})`,"stroke-width":s.w||2,"stroke-linejoin":"round","stroke-linecap":"round"},svg);
+    if(opt.endLabels) ends.push({s,y:y(Math.max(lo,Math.min(hi,s.data[n-1])))});});
+  if(opt.endLabels){ends.sort((a,b)=>a.y-b.y);for(let i=1;i<ends.length;i++) if(ends[i].y-ends[i-1].y<13) ends[i].y=ends[i-1].y+13;
+    ends.forEach(e=>{const t=el("text",{x:W-R+8,y:e.y+4,class:"lbl"},svg);t.textContent=e.s.short+" "+fmt(e.s.data[n-1]);});}
+  const cx=el("line",{y1:T,y2:H-B,stroke:"var(--ink-3)","stroke-dasharray":"2 3",visibility:"hidden"},svg);
+  const dots=opt.series.map(s=>el("circle",{r:4,fill:`var(${s.c})`,stroke:"var(--surface)","stroke-width":2,visibility:"hidden"},svg));
+  const ro=document.getElementById(opt.readout);
+  const show=i=>{const j=i??n-1; ro.textContent=opt.label(j)+" · "+opt.series.map(s=>s.name+" "+(s.data[j]>0&&!opt.unsigned?"+":"")+fmt(s.data[j])+"%").join(" · ");
+    cx.setAttribute("visibility",i==null?"hidden":"visible");cx.setAttribute("x1",x(j));cx.setAttribute("x2",x(j));
+    dots.forEach((d,k)=>{const v=opt.series[k].data[j];d.setAttribute("visibility",i==null?"hidden":"visible");d.setAttribute("cx",x(j));d.setAttribute("cy",y(Math.max(lo,Math.min(hi,v))));});};
+  svg.onpointermove=e=>{const r=svg.getBoundingClientRect();const px=(e.clientX-r.left)*W/r.width;show(Math.max(0,Math.min(n-1,Math.round((px-L)/(W-L-R)*(n-1)))));};
+  svg.onpointerleave=()=>show(null); show(null);
+}
+function priceChart(id,ro,lg,defs,range){
+  const start=range==="all"?0:PR.m.indexOf("2025-01");
+  const m=PR.m.slice(start);
+  const series=defs.map(d=>({...d,data:PR[d.k].slice(start)}));
+  legend(lg,series);
+  const vals=series.flatMap(s=>s.data); const step=range==="all"?20:5;
+  const lo=Math.floor(Math.min(0,...vals)/step)*step, hi=Math.ceil(Math.max(...vals)/step)*step;
+  const ticks=m.map((v,i)=>v.endsWith("-01")?i:-1).filter(i=>i>=0);
+  const band=range==="all"?[PR.m.indexOf("2022-01"),PR.m.indexOf("2023-06"),"2022-23"]:null;
+  lineChart(document.getElementById(id),{x:m,ticks,tickLabel:i=>range==="all"?m[i].slice(0,4):MES[+m[i].slice(5)-1]+" "+m[i].slice(2,4),label:j=>mlab(m[j]),readout:ro,endLabels:true,lo,hi,step,series,band});
+}
+const PDEF=[{k:"TOTAL",name:"Indice generale",short:"Totale",c:"--c1",w:2.5},{k:"NRG",name:"Energia",short:"Energia",c:"--c2"},{k:"FOOD",name:"Alimentari",short:"Alimentari",c:"--c3"},{k:"CORE",name:"Di fondo",short:"Di fondo",c:"--c4"}];
+const EDEF=[{k:"DIESEL",name:"Gasolio",short:"Gasolio",c:"--c2",w:2.5},{k:"ELGAS",name:"Elettricità e gas",short:"Luce e gas",c:"--c1"}];
+function wire(prefix,id,ro,lg,defs){let r="all";const set=v=>{r=v;document.getElementById(prefix+"-all").setAttribute("aria-pressed",v==="all");document.getElementById(prefix+"-26").setAttribute("aria-pressed",v!=="all");priceChart(id,ro,lg,defs,v);};
+  document.getElementById(prefix+"-all").onclick=()=>set("all");document.getElementById(prefix+"-26").onclick=()=>set("26");set("all");}
+wire("pr","ch-pr","ro-pr","lg-pr",PDEF);
+wire("en","ch-en","ro-en","lg-en",EDEF);
+
+/* PAC charts */
+(()=>{const s=document.getElementById("ch-cap");
+  const rows=[["Affitti, breve periodo",9.1,46.2,null],["Affitti, lungo periodo",11,55,null],["Affitti, media letteratura",null,null,50.4],["Valori fondiari, media letteratura",null,null,39.6]];
+  const W=520,L=230,R=78,rh=48,T=8,x=v=>L+(W-L-R)*v/60;
+  for(let v=0;v<=60;v+=10){el("line",{x1:x(v),x2:x(v),y1:T,y2:T+rows.length*rh,stroke:v?"var(--grid)":"var(--ink-3)"},s);const t=el("text",{x:x(v),y:T+rows.length*rh+14,"text-anchor":"middle"},s);t.textContent=v;}
+  rows.forEach(([k,a,b,m],i)=>{const yy=T+i*rh+rh/2;const t=el("text",{x:L-10,y:yy+4,"text-anchor":"end",class:"lbl"},s);t.textContent=k;
+    if(a!=null){el("rect",{x:x(a),y:yy-8,width:x(b)-x(a),height:16,rx:3,fill:"var(--c1)","fill-opacity":.85},s);const v=el("text",{x:x(b)+6,y:yy+4,class:"strong"},s);v.textContent=fmt(a,1)+"–"+fmt(b,1);}
+    else{el("circle",{cx:x(m),cy:yy,r:6,fill:"var(--c2)",stroke:"var(--surface)","stroke-width":2},s);const v=el("text",{x:x(m)+10,y:yy+4,class:"strong"},s);v.textContent=fmt(m,1);}});
+})();
+(()=>{const s=document.getElementById("ch-size");
+  const rows=[["Italia",10.5,null,"--c2"],["UE27",17.8,null,"--muted"],["Germania e Francia",60,70,"--c1"]];
+  const W=520,L=150,R=70,rh=56,T=8,x=v=>L+(W-L-R)*v/75;
+  rows.forEach(([k,a,b,c],i)=>{const yy=T+i*rh;const t=el("text",{x:L-10,y:yy+rh/2+4,"text-anchor":"end",class:"lbl"},s);t.textContent=k;
+    if(b==null){el("rect",{x:L,y:yy+14,width:x(a)-L,height:rh-28,rx:2,fill:`var(${c})`},s);const v=el("text",{x:x(a)+6,y:yy+rh/2+4,class:"strong"},s);v.textContent=fmt(a)+" ha";}
+    else{el("rect",{x:L,y:yy+14,width:x(a)-L,height:rh-28,rx:2,fill:`var(${c})`},s);el("rect",{x:x(a)+2,y:yy+14,width:x(b)-x(a)-2,height:rh-28,rx:2,fill:`var(${c})`,"fill-opacity":.35},s);const v=el("text",{x:x(b)+6,y:yy+rh/2+4,class:"strong"},s);v.textContent="60–70 ha";}});
+})();
+(()=>{const VA=[["Italia",46.6,74.6],["Francia",53.0,85.8],["Germania",68.4,86.6],["Spagna",55.9,65.8],["UE27",33.0,74.3]];
+  let mode="rel";
+  const draw=()=>{const s=document.getElementById("ch-va");s.innerHTML="";const W=520,L=100,R=60,rh=38,T=6;
+    const vals=VA.map(([k,a,t])=>[k,mode==="rel"?Math.round(a/t*100):a]);const max=mode==="rel"?100:90;const x=v=>L+(W-L-R)*v/max;
+    if(mode==="rel"){el("line",{x1:x(100),x2:x(100),y1:T,y2:T+VA.length*rh,stroke:"var(--ink-3)","stroke-dasharray":"3 3"},s);const t=el("text",{x:x(100),y:T+VA.length*rh+14,"text-anchor":"end"},s);t.textContent="media economia = 100";}
+    vals.forEach(([k,v],i)=>{const yy=T+i*rh;const t=el("text",{x:L-10,y:yy+rh/2+4,"text-anchor":"end",class:k==="Italia"?"strong":"lbl"},s);t.textContent=k;
+      el("rect",{x:L,y:yy+9,width:x(v)-L,height:rh-18,rx:2,fill:k==="Italia"?"var(--c2)":"var(--c1)"},s);const vt=el("text",{x:x(v)+6,y:yy+rh/2+4,class:"strong"},s);vt.textContent=mode==="rel"?v+"%":fmt(v)+" k€";});
+    document.getElementById("nt-va").innerHTML=mode==="rel"?"<b>Unità:</b> valore aggiunto per occupato in agricoltura, silvicoltura e pesca, in % di quello dell'intera economia dello stesso paese, 2024.<br><b>Fonte:</b> Eurostat (nama_10_a10, nama_10_a10_e).":"<b>Unità:</b> migliaia di euro correnti di valore aggiunto per occupato in agricoltura, silvicoltura e pesca, 2024; non corretti per il potere d'acquisto.<br><b>Fonte:</b> Eurostat (nama_10_a10, nama_10_a10_e).";};
+  const set=m=>{mode=m;document.getElementById("va-rel").setAttribute("aria-pressed",m==="rel");document.getElementById("va-abs").setAttribute("aria-pressed",m!=="rel");draw();};
+  document.getElementById("va-rel").onclick=()=>set("rel");document.getElementById("va-abs").onclick=()=>set("abs");set("rel");
+})();
+(()=>{const s=document.getElementById("ch-irr");
+  const rows=[["Altri servizi alle persone (incl. lavoro domestico)",41.4],["Agricoltura",18.4],["Commercio, trasporti, alloggio e ristorazione",15.5],["Costruzioni",13.6],["Totale economia",13.1],["Industria in senso stretto",6.0]];
+  const W=640,L=325,R=50,rh=36,T=4,x=v=>L+(W-L-R)*v/45;
+  rows.forEach(([k,v],i)=>{const yy=T+i*rh;const t=el("text",{x:L-10,y:yy+rh/2+4,"text-anchor":"end",class:k==="Agricoltura"||k==="Totale economia"?"strong":"lbl"},s);t.textContent=k;
+    el("rect",{x:L,y:yy+8,width:x(v)-L,height:rh-16,rx:2,fill:k==="Totale economia"?"var(--muted)":k==="Agricoltura"?"var(--c2)":"var(--c1)"},s);const vt=el("text",{x:x(v)+6,y:yy+rh/2+4,class:"strong"},s);vt.textContent=fmt(v)+"%";});
+})();
+/* interest */
+(()=>{const Y=[];for(let y=1995;y<=2025;y++)Y.push(y);const V=[11.1,11.0,9.1,7.8,6.4,6.1,6.0,5.4,4.9,4.6,4.5,4.4,4.7,4.9,4.4,4.3,4.6,5.1,4.8,4.6,4.1,3.9,3.8,3.6,3.3,3.4,3.4,4.1,3.6,3.9,3.8];
+  lineChart(document.getElementById("ch-int"),{x:Y,ticks:[0,5,10,15,20,25,30],tickLabel:i=>Y[i],label:j=>Y[j],readout:"ro-int",endLabels:true,lo:0,hi:12,step:2,unsigned:true,series:[{name:"Interessi, % del PIL",short:"Interessi",data:V,c:"--c1",w:2.5}]});
+})();
+
+/* forbice */
+(()=>{const s=document.getElementById("ch-fb");
+  const rows=[["g","Settembre 2026"],["Prezzi pagati agli agricoltori",-3.5],["Prezzi al consumo degli alimentari",1.9],["Gasolio alla pompa",34.8],["g","Agosto 2026"],["Costi agricoli (input)",8.4]];
+  const W=640,L=250,R=56,rh=34,T=4,lo=-10,hi=40,x=v=>L+(W-L-R)*(v-lo)/(hi-lo);const Hb=T+rows.length*rh;
+  for(let v=lo;v<=hi;v+=10){el("line",{x1:x(v),x2:x(v),y1:T,y2:Hb,stroke:v===0?"var(--ink-3)":"var(--grid)"},s);const t=el("text",{x:x(v),y:Hb+16,"text-anchor":"middle"},s);t.textContent=(v>0?"+":"")+v+"%";}
+  rows.forEach(([k,v],i)=>{const yy=T+i*rh;
+    if(k==="g"){const t=el("text",{x:12,y:yy+rh/2+6,class:"strong"},s);t.textContent=v;el("line",{x1:12,x2:W-R,y1:yy+rh-2,y2:yy+rh-2,stroke:"var(--rule)"},s);return;}
+    const t=el("text",{x:L-10,y:yy+rh/2+4,"text-anchor":"end",class:"lbl"},s);t.textContent=k;
+    const a=x(Math.min(0,v)),b=x(Math.max(0,v));el("rect",{x:a,y:yy+8,width:b-a,height:rh-16,rx:2,fill:v<0?"var(--down)":"var(--up)"},s);
+    const vt=el("text",{x:v<0?a-6:b+6,y:yy+rh/2+4,"text-anchor":v<0?"end":"start",class:"strong"},s);vt.textContent=(v>0?"+":"−")+fmt(Math.abs(v))+"%";});
+})();
+/* PAC */
+(()=>{const s=document.getElementById("ch-pac");const rows=[["Ciclo precedente",37.7,"--muted"],["Proposta iniziale (lug. 2025)",31.0,"--up"],["Proposta rivista (gen. 2026)",40.7,"--c1"]];
+  const W=520,L=200,R=50,rh=50,T=8,x=v=>L+(W-L-R)*v/45;
+  rows.forEach(([k,v,c],i)=>{const yy=T+i*rh;const t=el("text",{x:L-10,y:yy+rh/2+4,"text-anchor":"end",class:"lbl"},s);t.textContent=k;
+    el("rect",{x:L,y:yy+12,width:x(v)-L,height:rh-24,rx:2,fill:`var(${c})`},s);const vt=el("text",{x:x(v)+6,y:yy+rh/2+4,class:"strong"},s);vt.textContent=fmt(v)+" mld";});
+})();
+})();
+(()=>{
+
+const D = {"years":[1995,1996,1997,1998,1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024],"total":[51.4,51.3,49.3,48.0,47.1,46.4,47.1,46.5,47.0,46.7,47.1,47.6,46.6,47.8,51.1,49.8,49.0,50.5,50.9,50.7,50.2,49.0,48.8,48.3,48.4,56.8,56.0,54.9,53.6,50.4],"total2025":51.1,"components":[{"id":"pensioni","name":"Vecchiaia e superstiti (pensioni)","pil":[null,null,null,null,null,null,13.8,13.4,14.0,14.0,14.0,14.1,14.2,14.6,15.7,15.8,15.7,16.1,16.5,16.4,16.4,15.9,15.9,15.8,16.1,17.8,16.5,15.8,16.0,16.3],"note":"COFOG 10.2 + 10.3. Le pensioni di invalidità sono in \"altra protezione sociale\"","share":[null,null,null,null,null,null,29.3,28.8,29.8,30.0,29.7,29.6,30.5,30.5,30.7,31.7,32.0,31.9,32.4,32.3,32.7,32.4,32.6,32.7,33.3,31.3,29.5,28.8,29.9,32.3],"short":"Pensioni"},{"id":"sociale","name":"Altra protezione sociale","pil":[null,null,null,null,null,null,2.7,2.8,3.0,3.1,3.1,3.1,3.1,3.3,4.0,3.9,3.8,4.1,4.3,4.6,4.8,4.9,4.7,4.8,4.9,7.2,6.1,5.6,5.0,5.0],"note":"Dal 2001: famiglia +0,7 (assegno unico), esclusione sociale +0,6 (bonus 80/100 €, RdC), disoccupazione +0,5, invalidità +0,4","share":[null,null,null,null,null,null,5.7,6.0,6.4,6.6,6.6,6.5,6.7,6.9,7.8,7.8,7.8,8.1,8.4,9.1,9.6,10.0,9.6,9.9,10.1,12.7,10.9,10.2,9.3,9.9],"short":"Altra prot. sociale"},{"id":"sanita","name":"Sanità","pil":[5.1,5.2,5.4,5.4,5.5,5.8,6.1,6.2,6.2,6.5,6.8,6.8,6.6,7.0,7.4,7.4,7.1,7.1,7.0,7.0,7.0,6.8,6.8,6.7,6.7,7.8,7.4,6.9,6.5,6.6],"note":"COFOG 07","share":[9.9,10.1,11.0,11.2,11.7,12.5,13.0,13.3,13.2,13.9,14.4,14.3,14.2,14.6,14.5,14.9,14.5,14.1,13.8,13.8,13.9,13.9,13.9,13.9,13.8,13.7,13.2,12.6,12.1,13.1],"short":"Sanità"},{"id":"interessi","name":"Interessi sul debito","pil":[11.1,11.0,9.1,7.8,6.4,6.1,6.1,5.5,5.0,4.8,4.7,4.6,4.8,5.0,4.6,4.5,4.8,5.3,5.0,4.7,4.3,4.1,3.9,3.8,3.5,3.6,3.6,4.3,3.7,4.0],"note":"COFOG 01.7 (1995–2000: interessi passivi D.41)","share":[21.6,21.4,18.5,16.2,13.6,13.1,13.0,11.8,10.6,10.3,10.0,9.7,10.3,10.5,9.0,9.0,9.8,10.5,9.8,9.3,8.6,8.4,8.0,7.9,7.2,6.3,6.4,7.8,6.9,7.9],"short":"Interessi"},{"id":"economia","name":"Affari economici","pil":[4.2,4.2,3.6,3.8,3.8,3.7,4.3,4.2,4.1,3.9,4.0,4.9,4.0,3.8,4.5,4.0,4.0,4.3,4.2,4.5,4.7,4.2,4.6,4.2,4.2,5.9,6.7,6.5,5.8,5.1],"note":"Trasporti, energia, sussidi alle imprese","share":[8.2,8.2,7.3,7.9,8.1,8.0,9.1,9.0,8.7,8.4,8.5,10.3,8.6,7.9,8.8,8.0,8.2,8.5,8.3,8.9,9.4,8.6,9.4,8.7,8.7,10.4,12.0,11.8,10.8,10.1],"short":"Affari economici"},{"id":"istruzione","name":"Istruzione","pil":[4.4,4.5,4.5,4.5,4.5,4.4,4.4,4.5,4.6,4.4,4.5,4.4,4.5,4.3,4.6,4.4,4.1,4.1,4.1,4.1,4.0,3.9,4.0,4.0,4.0,4.3,4.2,4.0,3.9,4.0],"note":"COFOG 09","share":[8.6,8.8,9.1,9.4,9.6,9.5,9.3,9.7,9.8,9.4,9.6,9.2,9.7,9.0,9.0,8.8,8.4,8.1,8.1,8.1,8.0,8.0,8.2,8.3,8.3,7.6,7.5,7.3,7.3,7.9],"short":"Istruzione"},{"id":"generali","name":"Servizi generali escl. interessi","pil":[4.1,4.4,4.3,4.4,4.6,4.5,4.6,4.7,4.8,4.7,4.7,4.6,4.3,4.5,4.6,4.4,4.3,4.3,4.4,4.2,3.9,3.9,3.8,3.9,3.8,4.4,4.1,3.8,3.7,3.7],"note":"Organi istituzionali, fisco, esteri, trasferimenti","share":[8.0,8.6,8.7,9.2,9.8,9.7,9.8,10.1,10.2,10.1,10.0,9.7,9.2,9.4,9.0,8.8,8.8,8.5,8.6,8.3,7.8,8.0,7.8,8.1,7.9,7.7,7.3,6.9,6.9,7.3],"short":"Servizi generali"},{"id":"abitazioni","name":"Abitazioni e territorio","pil":[0.6,0.6,0.6,0.6,0.6,0.6,0.6,0.6,0.6,0.6,0.6,0.6,0.6,0.6,0.6,0.6,0.5,0.6,0.5,0.5,0.5,0.4,0.4,0.4,0.4,0.6,2.4,3.3,4.4,0.8],"note":"Il picco 2021–23 è il Superbonus","share":[1.2,1.2,1.2,1.2,1.3,1.3,1.3,1.3,1.3,1.3,1.3,1.3,1.3,1.3,1.2,1.2,1.0,1.2,1.0,1.0,1.0,0.8,0.8,0.8,0.8,1.1,4.3,6.0,8.2,1.6],"short":"Abitazioni"},{"id":"ordine","name":"Ordine pubblico e sicurezza","pil":[1.9,2.0,2.0,2.0,2.0,2.0,1.8,1.9,2.0,1.9,1.9,1.8,1.8,1.8,1.9,1.9,1.9,1.9,1.9,1.9,1.9,1.8,1.8,1.8,1.8,2.0,1.8,1.8,1.7,1.8],"note":"Polizia, vigili del fuoco, giustizia, carceri","share":[3.7,3.9,4.1,4.2,4.2,4.3,3.8,4.1,4.3,4.1,4.0,3.8,3.9,3.8,3.7,3.8,3.9,3.8,3.7,3.7,3.8,3.7,3.7,3.7,3.7,3.5,3.2,3.3,3.2,3.6],"short":"Ordine pubblico"},{"id":"difesa","name":"Difesa","pil":[1.2,1.2,1.2,1.1,1.1,1.1,1.2,1.1,1.2,1.3,1.3,1.2,1.2,1.3,1.5,1.4,1.4,1.3,1.2,1.2,1.2,1.3,1.3,1.2,1.3,1.4,1.4,1.2,1.2,1.3],"note":"COFOG 02, perimetro nazionale","share":[2.3,2.3,2.4,2.3,2.3,2.4,2.5,2.4,2.6,2.8,2.8,2.5,2.6,2.7,2.9,2.8,2.9,2.6,2.4,2.4,2.4,2.7,2.7,2.5,2.7,2.5,2.5,2.2,2.2,2.6],"short":"Difesa"},{"id":"altro","name":"Ambiente e cultura","pil":[1.4,1.4,1.5,1.6,1.6,1.5,1.5,1.6,1.5,1.5,1.5,1.4,1.5,1.5,1.6,1.6,1.5,1.5,1.7,1.5,1.6,1.7,1.7,1.7,1.7,1.8,1.9,1.8,1.7,1.8],"note":"COFOG 05 + 08","share":[2.7,2.7,3.0,3.3,3.4,3.2,3.2,3.4,3.2,3.2,3.2,2.9,3.2,3.1,3.1,3.2,3.1,3.0,3.3,3.0,3.2,3.5,3.5,3.5,3.5,3.2,3.4,3.3,3.2,3.6],"short":"Ambiente e cultura"}],"sum":{"id":"rigida","name":"Pensioni + interessi","note":"Somma dei due pannelli: spesa già impegnata prima di ogni legge di bilancio","pil":[null,null,null,null,null,null,19.9,18.9,19.0,18.8,18.7,18.7,19.0,19.6,20.3,20.3,20.5,21.4,21.5,21.1,20.7,20.0,19.8,19.6,19.6,21.4,20.1,20.1,19.7,20.3],"share":[null,null,null,null,null,null,42.3,40.6,40.4,40.3,39.7,39.3,40.8,41.0,39.7,40.8,41.8,42.4,42.2,41.6,41.2,40.8,40.6,40.6,40.5,37.7,35.9,36.6,36.8,40.3],"derived":true}};
+const Y = D.years, N = Y.length;
+const fmt = (v,d=1)=> v==null ? "–" : v.toLocaleString("it-IT",{minimumFractionDigits:d,maximumFractionDigits:d});
+const sgn = v => (v>0?"+":v<0?"−":"±")+fmt(Math.abs(v));
+const NS="http://www.w3.org/2000/svg";
+const el=(t,a={},p)=>{const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);if(p)p.appendChild(e);return e};
+let unit="pil", hover=null;
+const B0 = Y.indexOf(2001), B1 = N-1;
+const niceMax = m => { const s=[1,2,2.5,5,10]; const p=Math.pow(10,Math.floor(Math.log10(m))); for(const k of s){ if(k*p>=m) return k*p;} return 10*p; };
+
+/* total line */
+function drawTotal(){
+  const s=document.getElementById("total"); s.innerHTML="";
+  const W=520,H=230,L=36,R=14,T=10,Bm=26;
+  const ys=[...D.total,D.total2025], yr=[...Y,2025];
+  const lo=40,hi=60, x=i=>L+(W-L-R)*i/(yr.length-1), y=v=>T+(H-T-Bm)*(hi-v)/(hi-lo);
+  for(let v=lo;v<=hi;v+=5){el("line",{x1:L,x2:W-R,y1:y(v),y2:y(v),stroke:"var(--grid)"},s);const t=el("text",{x:L-6,y:y(v)+4,"text-anchor":"end"},s);t.textContent=v;}
+  [1995,2000,2005,2010,2015,2020,2025].forEach(yy=>{const i=yr.indexOf(yy);const t=el("text",{x:x(i),y:H-6,"text-anchor":"middle"},s);t.textContent=yy;});
+  let d=""; for(let i=0;i<yr.length-1;i++) d+=(i?"L":"M")+x(i)+" "+y(ys[i]);
+  el("path",{d,fill:"none",stroke:"var(--line)","stroke-width":2,"stroke-linejoin":"round"},s);
+  el("path",{d:`M${x(yr.length-2)} ${y(ys[yr.length-2])}L${x(yr.length-1)} ${y(ys[yr.length-1])}`,fill:"none",stroke:"var(--line)","stroke-width":2,"stroke-dasharray":"3 3"},s);
+  const cx=el("line",{y1:T,y2:H-Bm,stroke:"var(--ink-3)","stroke-dasharray":"2 3",visibility:"hidden"},s);
+  const dot=el("circle",{r:4.5,fill:"var(--line)",stroke:"var(--surface)","stroke-width":2},s);
+  s._upd=(i)=>{const j=i==null?yr.length-2:i; dot.setAttribute("cx",x(j));dot.setAttribute("cy",y(ys[j]));
+    cx.setAttribute("x1",x(j));cx.setAttribute("x2",x(j));cx.setAttribute("visibility",i==null?"hidden":"visible");
+    document.getElementById("tot-val").textContent=fmt(ys[j])+"%";
+    document.getElementById("tot-cap").textContent="del PIL nel "+yr[j]+(yr[j]===2025?" (provvisorio)":"");};
+  s._upd(hover);
+  s.onpointermove=e=>{const r=s.getBoundingClientRect();const px=(e.clientX-r.left)*W/r.width;let i=Math.round((px-L)/(W-L-R)*(yr.length-1));i=Math.max(0,Math.min(yr.length-1,i));
+    setHover(i<N?i:null, i===N? N : null);};
+  s.onpointerleave=()=>setHover(null);
+}
+
+/* delta bars */
+function drawDelta(){
+  const s=document.getElementById("delta"); s.innerHTML="";
+  const key=unit==="pil"?"pil":"share";
+  const rows=D.components.map(c=>({c,v:+(c[key][B1]-c[key][B0]).toFixed(1)})).sort((a,b)=>b.v-a.v);
+  const W=460,rowH=27,T=8,lab=150,R=46; const H=T+rows.length*rowH+22; s.setAttribute("viewBox",`0 0 ${W} ${H}`);
+  const lo=Math.floor(Math.min(0,...rows.map(r=>r.v))), hi=Math.ceil(Math.max(0,...rows.map(r=>r.v)));
+  const x=v=>lab+(W-lab-R)*(v-lo)/(hi-lo); const st=(hi-lo)>6?2:1;
+  for(let v=lo;v<=hi;v+=st){el("line",{x1:x(v),x2:x(v),y1:T,y2:H-22,stroke:v===0?"var(--ink-3)":"var(--grid)"},s);const t=el("text",{x:x(v),y:H-6,"text-anchor":"middle"},s);t.textContent=(v>0?"+":"")+fmt(v,0);}
+  rows.forEach((r,i)=>{const yy=T+i*rowH;
+    const t=el("text",{x:lab-10,y:yy+rowH/2+4,"text-anchor":"end",class:r.c.id==="difesa"?"strong":"lbl"},s); t.textContent=r.c.short;
+    const a=x(Math.min(0,r.v)), b=x(Math.max(0,r.v)); const w=Math.max(b-a,1.5);
+    const col=r.v>0.05?"var(--up)":r.v<-0.05?"var(--down)":"var(--ink-3)";
+    el("rect",{x:a,y:yy+6,width:w,height:rowH-12,rx:2,fill:col},s);
+    const vt=el("text",{x:r.v>=0?b+6:a-6,y:yy+rowH/2+4,"text-anchor":r.v>=0?"start":"end",class:"strong"},s); vt.textContent=sgn(r.v);
+  });
+  document.getElementById("delta-sub").textContent= "Unità: differenza 2001-2024, in "+(unit==="pil"?"punti di PIL.":"punti percentuali della spesa totale.");
+}
+
+/* small multiples */
+const minis=[];
+function buildMulti(){
+  const g=document.getElementById("multi");
+  [...D.components,D.sum].forEach(c=>{
+    const card=document.createElement("article"); card.className="mini"+(c.id==="difesa"?" is-def":"")+(c.derived?" is-sum":"");
+    card.innerHTML=`<h3>${c.name}</h3><div class="row"><span><span class="val"></span> <span class="yr"></span></span><span class="chip"></span></div><svg viewBox="0 0 260 120" aria-hidden="true"></svg><p class="note">${c.note}</p>`;
+    g.appendChild(card); minis.push({c,card});
+  });
+}
+function drawMinis(){
+  const key=unit==="pil"?"pil":"share";
+  minis.forEach(m=>{
+    const s=m.card.querySelector("svg"); s.innerHTML="";
+    const W=260,H=120,L=30,R=8,T=8,Bm=18, v=m.c[key];
+    const hi=niceMax(Math.max(...v.filter(z=>z!=null))*1.05);
+    const x=i=>L+(W-L-R)*i/(N-1), y=z=>T+(H-T-Bm)*(hi-z)/hi;
+    [0,hi/2,hi].forEach(z=>{el("line",{x1:L,x2:W-R,y1:y(z),y2:y(z),stroke:z===0?"var(--rule)":"var(--grid)"},s);const t=el("text",{x:L-5,y:y(z)+4,"text-anchor":"end"},s);t.textContent=z.toLocaleString("it-IT",{maximumFractionDigits:2});});
+    [1995,2010,2024].forEach(yy=>{const i=Y.indexOf(yy);const t=el("text",{x:x(i),y:H-4,"text-anchor":i===0?"start":i===N-1?"end":"middle"},s);t.textContent=yy;});
+    let d="",pen=false; v.forEach((z,i)=>{if(z==null){pen=false;return;} d+=(pen?"L":"M")+x(i).toFixed(1)+" "+y(z).toFixed(1); pen=true;});
+    el("path",{d:d+`L${x(N-1)} ${y(0)}L${x(v.findIndex(z=>z!=null))} ${y(0)}Z`,fill:"var(--line)","fill-opacity":.08,stroke:"none"},s);
+    el("path",{d,fill:"none",stroke:m.c.id==="difesa"?"var(--hl)":"var(--line)","stroke-width":2,"stroke-linejoin":"round",class:"ln"},s);
+    const cx=el("line",{y1:T,y2:H-Bm,stroke:"var(--ink-3)","stroke-dasharray":"2 3",visibility:"hidden"},s);
+    const dot=el("circle",{r:4,fill:m.c.id==="difesa"?"var(--hl)":"var(--line)",stroke:"var(--surface)","stroke-width":2},s);
+    const ch=m.card.querySelector(".chip"); const dv=+(v[B1]-v[B0]).toFixed(1);
+    ch.className="chip "+(dv>0.05?"up":dv<-0.05?"down":"flat"); ch.textContent=sgn(dv)+" dal 2001";
+    m.upd=(i)=>{let j=i==null?N-1:i; const z=v[j];
+      m.card.querySelector(".val").textContent= z==null?"n.d.":fmt(z)+"%"; m.card.querySelector(".yr").textContent=Y[j];
+      if(z==null){dot.setAttribute("visibility","hidden");}else{dot.setAttribute("visibility","visible");dot.setAttribute("cx",x(j));dot.setAttribute("cy",y(z));}
+      cx.setAttribute("x1",x(j));cx.setAttribute("x2",x(j));cx.setAttribute("visibility",i==null?"hidden":"visible");};
+    m.upd(hover);
+    s.onpointermove=e=>{const r=s.getBoundingClientRect();const px=(e.clientX-r.left)*W/r.width;let i=Math.round((px-L)/(W-L-R)*(N-1));setHover(Math.max(0,Math.min(N-1,i)));};
+    s.onpointerleave=()=>setHover(null);
+  });
+  document.getElementById("multi-sub").textContent=(unit==="pil"?"% del PIL.":"% della spesa pubblica totale.")+" Ogni pannello ha la propria scala, sempre con origine zero. Per confrontare i livelli tra voci usa il valore in alto.";
+}
+function setHover(i,tot){hover=i; minis.forEach(m=>m.upd&&m.upd(i)); const s=document.getElementById("total"); if(s._upd) s._upd(tot!=null?tot:i);}
+
+function drawTable(){
+  const key=unit==="pil"?"pil":"share";
+  let h="<table><thead><tr><th>Voce</th>"+Y.map(y=>`<th>${y}</th>`).join("")+"</tr></thead><tbody>";
+  D.components.forEach(c=>{h+=`<tr><td>${c.name}</td>`+c[key].map(v=>`<td>${fmt(v)}</td>`).join("")+"</tr>";});
+  h+=`<tr><td><b>Totale, % PIL</b></td>`+D.total.map(v=>`<td><b>${fmt(v)}</b></td>`).join("")+"</tr></tbody></table>";
+  document.getElementById("tbl").innerHTML=h;
+}
+function render(){drawTotal();drawDelta();drawMinis();drawTable();}
+function setUnit(u){unit=u;document.getElementById("u-pil").setAttribute("aria-pressed",u==="pil");document.getElementById("u-share").setAttribute("aria-pressed",u==="share");try{localStorage.setItem("unit",u)}catch(e){} render();}
+document.getElementById("u-pil").onclick=()=>setUnit("pil");
+document.getElementById("u-share").onclick=()=>setUnit("share");
+buildMulti();
+let saved=null; try{saved=localStorage.getItem("unit")}catch(e){}
+setUnit(saved==="share"?"share":"pil");
+
+const DEF={years:[2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025],
+ keys:[["pers","Personale","--c1"],["arm","Armamenti","--c2"],["inf","Infrastrutture","--c3"],["alt","Altro","--c4"]],
+ nom:{arm:[2.0,1.7,3.9,4.4,4.2,3.6,4.9,6.5,6.8,6.9,7.1,11.6],pers:[14.1,13.7,14.3,14.3,14.8,14.8,17.8,17.8,19.0,19.5,19.1,19.4],inf:[0.3,0.2,0.1,0.2,0.3,0.1,0.3,0.4,0.6,0.7,1.0,0.9],alt:[2.1,2.0,1.9,2.3,2.5,2.5,3.4,3.2,3.5,4.2,5.6,13.4],tot:[18.4,17.6,20.2,21.2,21.7,21.0,26.4,28.0,29.9,31.3,32.7,45.3]},
+ real:{arm:[2.2,1.8,4.0,4.5,4.3,3.7,5.0,6.5,6.6,6.3,6.3,10.1],pers:[15.3,14.6,15.0,14.8,15.4,15.2,18.0,17.8,18.4,17.8,17.1,16.9],inf:[0.3,0.2,0.1,0.2,0.3,0.1,0.3,0.4,0.6,0.6,0.9,0.8],alt:[2.3,2.2,2.0,2.4,2.6,2.6,3.5,3.2,3.4,3.9,5.0,11.7],tot:[20.0,18.9,21.1,21.9,22.6,21.6,26.7,28.0,28.9,28.6,29.2,39.5]}};
+let dmode="nom";
+function drawDef(){
+  const s=document.getElementById("defbars"); s.innerHTML=""; const d=DEF[dmode], n=DEF.years.length;
+  const W=900,H=300,L=40,R=10,T=14,Bm=26, hi=50, step=(W-L-R)/n, bw=step*0.62;
+  const y=v=>T+(H-T-Bm)*(hi-v)/hi;
+  for(let v=0;v<=hi;v+=10){el("line",{x1:L,x2:W-R,y1:y(v),y2:y(v),stroke:v?"var(--grid)":"var(--rule)"},s);const t=el("text",{x:L-6,y:y(v)+4,"text-anchor":"end"},s);t.textContent=v;}
+  const ro=document.getElementById("def-readout");
+  const show=i=>{const j=i==null?n-1:i; ro.textContent=DEF.years[j]+": totale "+fmt(d.tot[j])+" mld · "+DEF.keys.map(k=>k[1]+" "+fmt(d[k[0]][j])).join(" · ");};
+  DEF.years.forEach((yr,i)=>{
+    const x0=L+step*i+(step-bw)/2; let acc=0; const g=el("g",{},s);
+    DEF.keys.forEach(([k,,c],ki)=>{const v=d[k][i]; if(v<=0) return; const top=y(acc+v), bot=y(acc);
+      const h=Math.max(bot-top-(acc>0?2:0),0.8);
+      el("rect",{x:x0,y:top,width:bw,height:h,rx:ki===DEF.keys.length-1?3:0,fill:`var(${c})`},g); acc+=v;});
+    const tt=el("text",{x:x0+bw/2,y:y(d.tot[i])-6,"text-anchor":"middle",class:i===n-1?"strong":"lbl"},s); tt.textContent=fmt(d.tot[i]);
+    const xl=el("text",{x:x0+bw/2,y:H-8,"text-anchor":"middle"},s); xl.textContent=yr;
+    const hit=el("rect",{x:L+step*i,y:T,width:step,height:H-T-Bm,fill:"transparent"},s);
+    hit.onpointerenter=()=>{show(i);g.setAttribute("opacity",1);}; hit.onpointerleave=()=>show(null);
+  });
+  // annotation on 2025 "Altro"
+  const i=n-1, x0=L+step*i+(step-bw)/2, a=d.alt[i], base=d.pers[i]+d.arm[i]+d.inf[i];
+  const ay=y(base+a/2);
+  el("line",{x1:x0-6,x2:x0-46,y1:ay,y2:ay,stroke:"var(--ink-3)"},s);
+  const an=el("text",{x:x0-50,y:ay-4,"text-anchor":"end",class:"strong"},s); an.textContent="Altro "+sgn(+(a-d.alt[i-1]).toFixed(1))+" mld";
+  const an2=el("text",{x:x0-50,y:ay+11,"text-anchor":"end"},s); an2.textContent="in gran parte riclassificazioni";
+  show(null);
+}
+function setDef(m){dmode=m;document.getElementById("d-nom").setAttribute("aria-pressed",m==="nom");document.getElementById("d-real").setAttribute("aria-pressed",m==="real");drawDef();}
+document.getElementById("d-nom").onclick=()=>setDef("nom");
+document.getElementById("d-real").onclick=()=>setDef("real");
+drawDef();
+
+})();
+(()=>{
+
+const D={"q":["2014-Q1","2014-Q2","2014-Q3","2014-Q4","2015-Q1","2015-Q2","2015-Q3","2015-Q4","2016-Q1","2016-Q2","2016-Q3","2016-Q4","2017-Q1","2017-Q2","2017-Q3","2017-Q4","2018-Q1","2018-Q2","2018-Q3","2018-Q4","2019-Q1","2019-Q2","2019-Q3","2019-Q4","2020-Q1","2020-Q2","2020-Q3","2020-Q4","2021-Q1","2021-Q2","2021-Q3","2021-Q4","2022-Q1","2022-Q2","2022-Q3","2022-Q4","2023-Q1","2023-Q2","2023-Q3","2023-Q4","2024-Q1","2024-Q2","2024-Q3","2024-Q4","2025-Q1","2025-Q2","2025-Q3","2025-Q4","2026-Q1","2026-Q2"],"G":[99.1,99.1,99.14,99.07,99.39,99.88,100.05,100.68,100.81,101.19,101.97,102.36,102.84,103.25,103.42,104.07,103.89,104.19,104.3,104.76,104.89,105.33,104.84,104.4,98.74,86.29,98.5,99.01,100.6,103.22,105.89,107.59,108.3,110.0,110.17,109.91,110.58,110.55,110.74,111.33,111.49,111.78,111.84,111.96,112.4,112.37,112.61,112.97,113.33,113.51],"H":[99.57,99.46,99.61,99.93,99.5,99.89,100.12,100.49,102.19,101.88,101.7,102.27,102.45,103.38,103.34,104.25,103.13,104.36,104.25,103.87,104.68,103.87,103.98,103.25,94.91,79.84,96.28,95.42,96.79,99.61,103.33,103.61,104.23,105.67,105.51,106.96,108.3,108.54,109.28,110.66,111.05,110.68,110.86,111.22,112.25,112.12,112.95,113.02,113.34,113.76],"E":[99.17,99.18,99.46,99.59,99.57,99.52,100.31,100.61,100.91,101.55,101.42,101.85,102.32,102.39,102.97,102.81,103.2,103.97,103.82,103.67,104.03,104.52,104.55,104.12,103.98,100.75,101.67,102.27,101.87,102.8,103.75,104.19,104.1,105.32,105.07,106.04,106.84,106.93,107.14,108.29,108.44,108.87,109.63,109.38,110.03,110.0,110.27,110.74,111.25,111.64],"prod":[99.53,99.64,99.53,99.14,99.89,99.99,99.93,100.19,98.65,99.32,100.27,100.09,100.38,99.87,100.08,99.83,100.74,99.84,100.05,100.86,100.2,101.41,100.83,101.11,104.04,108.08,102.31,103.76,103.94,103.62,102.48,103.84,103.9,104.1,104.42,102.76,102.11,101.85,101.34,100.61,100.4,100.99,100.88,100.67,100.13,100.22,99.7,99.96,99.99,99.78],"hpw":[100.4,100.28,100.15,100.34,99.93,100.37,99.81,99.88,101.27,100.32,100.28,100.41,100.13,100.97,100.36,101.4,99.93,100.38,100.41,100.19,100.62,99.38,99.45,99.16,91.28,79.25,94.7,93.3,95.01,96.9,99.6,99.44,100.12,100.33,100.42,100.87,101.37,101.51,102.0,102.19,102.41,101.66,101.12,101.68,102.02,101.93,102.43,102.06,101.88,101.9],"years":[2000,2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025],"P":{"IT":[100.0,100.6,100.0,99.4,100.4,100.8,100.6,100.5,99.8,98.0,100.0,100.7,100.1,101.1,101.2,101.5,101.3,101.9,101.9,102.4,105.9,105.0,105.6,103.4,102.3,101.8],"DE":[100.0,102.4,103.3,104.3,105.2,107.0,108.8,110.0,109.9,106.7,109.1,111.8,112.7,113.2,114.4,115.3,116.9,119.3,119.8,120.8,121.9,124.0,124.0,122.6,122.1,123.4],"FR":[100.0,101.7,104.6,105.3,106.5,107.7,110.5,110.1,109.5,108.4,110.0,111.4,111.6,113.4,114.6,115.5,115.4,117.7,117.9,118.4,118.6,117.0,115.2,115.7,115.7,117.4],"ES":[100.0,100.0,100.2,100.5,100.8,101.1,101.7,102.7,102.8,105.2,107.8,109.4,111.6,113.3,113.8,115.0,115.4,116.2,116.2,116.4,116.5,115.9,117.3,117.0,118.0,118.7],"EA":[100.0,101.5,102.3,102.9,104.2,105.3,106.8,107.8,107.5,106.4,109.0,110.7,111.3,112.5,113.4,114.8,115.1,116.9,117.0,117.8,120.4,120.8,120.6,119.1,118.9,120.1]},"W":{"hour_defl":[100.0,101.1,101.2,102.7,103.5,104.5,103.8,103.5,103.3,106.8,107.7,106.1,104.3,105.0,104.8,105.6,104.6,103.7,103.6,104.9,109.8,106.9,101.7,98.0,98.2,99.4],"hour_hicp":[100.0,101.4,101.7,103.4,104.5,105.5,105.3,105.3,104.7,106.9,107.7,106.0,103.6,104.1,103.9,104.7,104.3,103.4,103.5,105.0,110.5,107.1,100.1,95.6,96.4,97.4],"emp_defl":[100.0,100.5,99.8,99.5,100.4,100.8,100.3,100.2,99.8,100.8,101.6,99.8,96.0,95.8,95.8,96.7,96.5,95.7,95.9,96.3,92.1,96.9,94.1,92.0,93.4,94.8],"emp_hicp":[100.0,100.8,100.3,100.2,101.4,101.8,101.7,102.0,101.2,100.9,101.6,99.8,95.4,94.9,95.0,95.9,96.2,95.4,95.8,96.4,92.7,97.1,92.6,89.8,91.7,92.9],"prod_it":[100.0,100.6,100.0,99.4,100.4,100.8,100.6,100.5,99.8,98.0,100.0,100.7,100.1,101.1,101.2,101.5,101.3,101.9,101.9,102.4,105.9,105.0,105.6,103.4,102.3,101.8]},"gdi_real":[100.0,101.9,103.2,103.8,105.1,105.5,106.5,107.8,106.0,104.2,102.5,102.2,96.6,95.9,96.4,97.5,98.3,99.1,99.2,99.1,96.4,99.8,99.7,100.3,101.5,102.3],"gdi_pc":[100.0,101.8,102.9,103.0,103.5,103.3,103.8,104.5,101.9,99.6,97.6,96.9,91.4,90.5,91.0,92.2,93.1,94.0,94.3,94.5,92.4,96.1,96.2,96.8,98.0,98.8],"pps_years":[2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025],"pps_rel":[101.2,100.4,100.8,100.4,99.3,98.3,96.2,96.6,98.4,98.3,96.9,95.6],"fin":{"years":[2019,2020,2021,2022,2023,2024,2025,2026,2027,2028,2029],"net":[-1.5,-9.4,-8.9,-8.1,-7.1,-3.4,-3.1,-2.9,-3.4,-3.2,-2.3],"prim":[1.9,-6.0,-5.5,-4.0,-3.5,0.5,0.8,1.2,0.9,1.4,2.4],"int":[3.4,3.4,3.4,4.1,3.6,3.9,3.9,4.1,4.3,4.6,4.7]}};
+const NS="http://www.w3.org/2000/svg";
+const el=(t,a={},p)=>{const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);if(p)p.appendChild(e);return e};
+const fmt=(v,d=1)=>v==null?"–":v.toLocaleString("it-IT",{minimumFractionDigits:d,maximumFractionDigits:d});
+const legend=(id,series)=>{document.getElementById(id).innerHTML=series.map(s=>`<span class="${s.dash?"dash":""}" style="--c:var(${s.c})">${s.name}</span>`).join("")};
+const qlab=q=>{const [y,t]=q.split("-");return t.replace("Q","")+"° trim. "+y};
+
+function lineChart(svg,opt){
+  svg.innerHTML="";
+  const vb=svg.viewBox.baseVal, W=vb.width, H=vb.height, L=40, R=opt.endLabels?118:14, T=12, B=26;
+  const n=opt.x.length, vals=opt.series.flatMap(s=>s.data);
+  let lo=opt.lo??Math.floor(Math.min(...vals)/opt.step)*opt.step, hi=opt.hi??Math.ceil(Math.max(...vals)/opt.step)*opt.step;
+  const x=i=>L+(W-L-R)*i/(n-1), y=v=>T+(H-T-B)*(hi-v)/(hi-lo);
+  for(let v=lo;v<=hi+1e-9;v+=opt.step){el("line",{x1:L,x2:W-R,y1:y(v),y2:y(v),stroke:Math.abs(v-(opt.base??-1e9))<1e-9?"var(--ink-3)":"var(--grid)","stroke-dasharray":Math.abs(v-(opt.base??-1e9))<1e-9?"3 3":""},svg);const t=el("text",{x:L-6,y:y(v)+4,"text-anchor":"end"},svg);t.textContent=fmt(v,0);}
+  opt.ticks.forEach(i=>{const t=el("text",{x:x(i),y:H-7,"text-anchor":i===0?"start":i===n-1?"end":"middle"},svg);t.textContent=opt.tickLabel(i);});
+  const ends=[];
+  opt.series.forEach(s=>{let d="";s.data.forEach((v,i)=>{d+=(i?"L":"M")+x(i).toFixed(1)+" "+y(v).toFixed(1)});
+    el("path",{d,fill:"none",stroke:`var(${s.c})`,"stroke-width":s.w||2,"stroke-linejoin":"round","stroke-linecap":"round","stroke-dasharray":s.dash||""},svg);
+    if(opt.endLabels) ends.push({s,y:y(s.data[n-1])});});
+  if(opt.endLabels){ends.sort((a,b)=>a.y-b.y);for(let i=1;i<ends.length;i++) if(ends[i].y-ends[i-1].y<13) ends[i].y=ends[i-1].y+13;
+    ends.forEach(e=>{const t=el("text",{x:W-R+8,y:e.y+4,class:e.s.strong?"strong":"lbl"},svg);t.textContent=e.s.short+" "+fmt(e.s.data[n-1]);});}
+  const cx=el("line",{y1:T,y2:H-B,stroke:"var(--ink-3)","stroke-dasharray":"2 3",visibility:"hidden"},svg);
+  const dots=opt.series.map(s=>el("circle",{r:4,fill:`var(${s.c})`,stroke:"var(--surface)","stroke-width":2,visibility:"hidden"},svg));
+  const ro=document.getElementById(opt.readout);
+  const show=i=>{const j=i??n-1; ro.textContent=opt.label(j)+" · "+opt.series.map(s=>s.name+" "+fmt(s.data[j])).join(" · ");
+    cx.setAttribute("visibility",i==null?"hidden":"visible");cx.setAttribute("x1",x(j));cx.setAttribute("x2",x(j));
+    dots.forEach((d,k)=>{d.setAttribute("visibility",i==null?"hidden":"visible");d.setAttribute("cx",x(j));d.setAttribute("cy",y(opt.series[k].data[j]));});};
+  svg.onpointermove=e=>{const r=svg.getBoundingClientRect();const px=(e.clientX-r.left)*W/r.width;show(Math.max(0,Math.min(n-1,Math.round((px-L)/(W-L-R)*(n-1)))));};
+  svg.onpointerleave=()=>show(null); show(null);
+}
+
+/* 1. quarterly */
+let qv="lev";
+function drawQ(){
+  const ticks=[0,8,16,24,32,40,48].filter(i=>i<D.q.length);
+  const base={x:D.q,ticks,tickLabel:i=>D.q[i].slice(0,4),label:j=>qlab(D.q[j]),readout:"ro-q",endLabels:true};
+  let series,o;
+  if(qv==="lev"){series=[{name:"PIL reale",short:"PIL",data:D.G,c:"--c1"},{name:"Ore lavorate",short:"Ore",data:D.H,c:"--c2"},{name:"Occupati",short:"Occupati",data:D.E,c:"--c3"}];o={lo:75,hi:115,step:5,base:100};
+    document.getElementById("nt-q").innerHTML="<b>Unità:</b> indice, 2015=100; dati trimestrali destagionalizzati.<br><b>Fonte:</b> Eurostat (namq_10_gdp, namq_10_a10_e).";}
+  else{series=[{name:"PIL per ora",short:"PIL/ora",data:D.prod,c:"--c1"},{name:"Ore per occupato",short:"Ore/occ.",data:D.hpw,c:"--c2"}];o={lo:84,hi:108,step:4,base:100};
+    document.getElementById("nt-q").innerHTML="<b>Unità:</b> indice, 2015=100; il picco del 2020 del PIL per ora è un effetto di composizione dovuto al lockdown.<br><b>Fonte:</b> Eurostat (namq_10_gdp, namq_10_a10_e).";}
+  legend("lg-q",series); lineChart(document.getElementById("ch-q"),{...base,...o,series});
+}
+const setQ=v=>{qv=v;document.getElementById("q-lev").setAttribute("aria-pressed",v==="lev");document.getElementById("q-rat").setAttribute("aria-pressed",v==="rat");drawQ();};
+document.getElementById("q-lev").onclick=()=>setQ("lev");document.getElementById("q-rat").onclick=()=>setQ("rat");
+
+/* 2. productivity */
+function drawP(){
+  const names={IT:"Italia",DE:"Germania",FR:"Francia",ES:"Spagna",EA:"Area euro"};
+  const series=["DE","EA","ES","FR"].map(k=>({name:names[k],short:names[k],data:D.P[k],c:"--muted",w:1.5}));
+  series.push({name:"Italia",short:"Italia",data:D.P.IT,c:"--c1",w:3,strong:true});
+  document.getElementById("lg-p").innerHTML=`<span style="--c:var(--c1)">Italia</span><span style="--c:var(--muted)">Germania, Francia, Spagna, area euro</span>`;
+  const n=D.years.length;
+  lineChart(document.getElementById("ch-p"),{x:D.years,ticks:[0,5,10,15,20,25],tickLabel:i=>D.years[i],label:j=>D.years[j],readout:"ro-p",endLabels:true,lo:90,hi:125,step:5,base:100,series});
+}
+
+/* 3. wages */
+let wd="defl";
+function drawW(){
+  const series=[{name:"Salario reale per ora",short:"Salario/ora",data:D.W["hour_"+wd],c:"--c1"},{name:"Salario reale per dipendente",short:"Salario/dip.",data:D.W["emp_"+wd],c:"--c2"},{name:"Produttività (PIL reale per ora)",short:"PIL/ora",data:D.W.prod_it,c:"--ink-3",dash:"5 4"}];
+  legend("lg-w",series);
+  lineChart(document.getElementById("ch-w"),{x:D.years,ticks:[0,5,10,15,20,25],tickLabel:i=>D.years[i],label:j=>D.years[j],readout:"ro-w",endLabels:true,lo:85,hi:110,step:5,base:100,series});
+}
+const setW=v=>{wd=v;document.getElementById("w-defl").setAttribute("aria-pressed",v==="defl");document.getElementById("w-hicp").setAttribute("aria-pressed",v==="hicp");drawW();};
+document.getElementById("w-defl").onclick=()=>setW("defl");document.getElementById("w-hicp").onclick=()=>setW("hicp");
+
+/* 4. income */
+function drawY(){
+  const series=[{name:"Aggregato",short:"Aggregato",data:D.gdi_real,c:"--c1"},{name:"Per abitante",short:"Per ab.",data:D.gdi_pc,c:"--c2"}];
+  legend("lg-y",series);
+  lineChart(document.getElementById("ch-y"),{x:D.years,ticks:[0,5,10,15,20,25],tickLabel:i=>D.years[i],label:j=>D.years[j],readout:"ro-y",endLabels:true,lo:88,hi:110,step:4,base:100,series});
+  lineChart(document.getElementById("ch-r"),{x:D.pps_years,ticks:[0,4,8,11],tickLabel:i=>D.pps_years[i],label:j=>D.pps_years[j],readout:"ro-r",endLabels:false,lo:92,hi:104,step:2,base:100,series:[{name:"Italia, UE=100",data:D.pps_rel,c:"--c1",w:2.5}]});
+}
+
+/* 5. fiscal bars */
+function drawF(){
+  const s=document.getElementById("ch-f"); s.innerHTML="";
+  const F=D.fin, n=F.years.length, W=640,H=300,L=40,R=12,T=14,B=26, lo=-10,hi=4;
+  const step=(W-L-R)/n, bw=step*0.32, y=v=>T+(H-T-B)*(hi-v)/(hi-lo);
+  for(let v=lo;v<=hi;v+=2){el("line",{x1:L,x2:W-R,y1:y(v),y2:y(v),stroke:v===0?"var(--ink-3)":"var(--grid)"},s);const t=el("text",{x:L-6,y:y(v)+4,"text-anchor":"end"},s);t.textContent=fmt(v,0);}
+  el("line",{x1:L,x2:W-R,y1:y(-3),y2:y(-3),stroke:"var(--ink-3)","stroke-dasharray":"4 3"},s);
+  const ro=document.getElementById("ro-f");
+  const show=i=>{const j=i??n-1;ro.textContent=F.years[j]+(F.years[j]>=2026?" (previsione)":"")+" · saldo primario "+fmt(F.prim[j])+" · indebitamento netto "+fmt(F.net[j])+" · interessi "+fmt(F.int[j]);};
+  F.years.forEach((yr,i)=>{const cx=L+step*i+step/2, op=yr>=2026?0.55:1;
+    [[F.prim[i],"--c1",-bw-1],[F.net[i],"--c2",1]].forEach(([v,c,dx])=>{const a=y(Math.max(0,v)),b=y(Math.min(0,v));el("rect",{x:cx+dx,y:a,width:bw,height:Math.max(b-a,1),rx:2,fill:`var(${c})`,"fill-opacity":op},s);});
+    const tv=el("text",{x:cx+1+bw/2,y:y(F.net[i])+13,"text-anchor":"middle",class:"lbl"},s);tv.textContent=fmt(F.net[i]);
+    const t=el("text",{x:cx,y:H-7,"text-anchor":"middle"},s);t.textContent=yr;
+    const hit=el("rect",{x:L+step*i,y:T,width:step,height:H-T-B,fill:"transparent"},s);hit.onpointerenter=()=>show(i);hit.onpointerleave=()=>show(null);});
+  const t3=el("text",{x:W-R,y:y(-3)-5,"text-anchor":"end"},s);t3.textContent="−3%";
+  show(null);
+}
+function drawM(){
+  const s=document.getElementById("ch-m"); s.innerHTML="";
+  const rows=[["Famiglia e sociale",5],["Difesa",4.6],["Imprese",3.4],["Infrastrutture",3.1],["Sanità",2.4],["Interventi fiscali",2.2]];
+  const W=420,L=140,R=40,rh=30,T=6, x=v=>L+(W-L-R)*v/5;
+  rows.forEach(([k,v],i)=>{const yy=T+i*rh;const t=el("text",{x:L-8,y:yy+rh/2+4,"text-anchor":"end",class:"lbl"},s);t.textContent=k;
+    el("rect",{x:L,y:yy+7,width:x(v)-L,height:rh-14,rx:2,fill:k==="Difesa"?"var(--c2)":"var(--c1)"},s);
+    const vt=el("text",{x:x(v)+6,y:yy+rh/2+4,class:"strong"},s);vt.textContent=fmt(v);});
+}
+setQ("lev");drawP();setW("defl");drawY();drawF();drawM();
+
+})();
+</script>
+
+</body>
+</html>
